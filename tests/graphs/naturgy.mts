@@ -237,8 +237,6 @@ const obtener_seduvi = tool(
 
       if (!data[0] || !data[0]?.id) {
         state.values.info_seduvi = null;
-
-
         const termParams = new URLSearchParams({
           collection: "seduvi",
           "filter[no_externo]": numero || "",
