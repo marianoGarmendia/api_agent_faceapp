@@ -34,9 +34,7 @@ import { encode } from "gpt-3-encoder";
 //   context: contexts.clinica.context,
 // };
 
-let info_seduvi = {
-  id: "",
-};
+
 // let info_visita={};
 
 // process.env.LANGCHAIN_CALLBACKS_BACKGROUND = "true";
@@ -99,7 +97,7 @@ const crearVisita = async (
 
   try {
     const response = await fetch(
-      "https://faceapp_test.techbank.ai:4002/public/visitas/",
+      "https://faceapp.techbank.ai:4001/public/visitas/",
       {
         method: "POST",
         headers: {
@@ -197,7 +195,7 @@ const crearVisita = async (
 
 const obtener_seduvi = tool(
   async ({ alcaldia, calle, colonia, numero }, config) => {
-    const baseUrl = "https://faceapp_test.techbank.ai:4002/public/places";
+    const baseUrl = "https://faceapp.techbank.ai:4001/public/places";
     // let config = { configurable: { thread_id: thread_id } };
     const state = await workflow.getState({
       configurable: { thread_id: config.configurable.thread_id },
@@ -241,11 +239,12 @@ const obtener_seduvi = tool(
           collection: "seduvi",
           "filter[no_externo]": numero || "",
           term: `Calle: ${calle || ""}, Alcaldia: ${alcaldia || ""}, Colonia: ${colonia || ""}`,
+          limit: "1",
         });
 
         const url = `${baseUrl}?${termParams.toString()}`;
         console.log("URL term:", url);
-        
+
         const res = await fetch(url, {
           headers: {
             "Content-Type": "application/json",
@@ -253,24 +252,33 @@ const obtener_seduvi = tool(
           },
         });
 
-        const data = await res.json();
-        if (!data[0] || !data[0]?.id) {
+        const dataTerm = await res.json();
+        if (!dataTerm[0] || !dataTerm[0]?.id) {
           state.values.info_seduvi = null;
           mensaje =
             "No hemos encontrado información en el seduvi, por favor verifica los datos ingresados o quizás no tenemos información de ese inmueble y quieras solicitar nuevo servicio";
         } else {
-          state.values.info_seduvi = data[0];
+          state.values.info_seduvi = dataTerm[0];
           mensaje =
             "Hemos encontrado la siguiente información en el seduvi, podemos continuar con la coordinación de la visita";
+          return new Command({
+            update: {
+              info_seduvi: dataTerm[0],
+              messages: [new ToolMessage(mensaje, tool_call_id, "get_seduvi")],
+            },
+          });
         }
+      } else {
+        state.values.info_seduvi = data[0];
+        mensaje =
+          "Hemos encontrado la siguiente información en el seduvi, podemos continuar con la coordinación de la visita";
+        return new Command({
+          update: {
+            info_seduvi: data[0],
+            messages: [new ToolMessage(mensaje, tool_call_id, "get_seduvi")],
+          },
+        });
       }
-
-      return new Command({
-        update: {
-          info_seduvi: data[0],
-          messages: [new ToolMessage(mensaje, tool_call_id, "get_seduvi")],
-        },
-      });
     } catch (error) {
       console.error("Error al obtener datos del SEDUVI:", error);
       throw error;
@@ -353,7 +361,7 @@ const crear_visita = tool(
     // }
 
     // id del seduvi
-    const id = info_seduvi?.id;
+    const id = state.values.info_seduvi?.id;
 
     const response_visita = await crearVisita(
       {
@@ -482,7 +490,7 @@ async function callModel(state: typeof newState.State, config: any) {
     Tu función es responder con precisión, sencillez y un tono amable. Siempre prioriza la seguridad, el ahorro energético y el impacto ambiental positivo del gas natural.
     
    
-        - Ahorro: $322 (36.5%)
+       
 
     ### ORDEN DE PREGUNTAS Y GUÍA SOBRE COMO INTERACTUAR CON EL USUARIO:
     
@@ -497,7 +505,7 @@ async function callModel(state: typeof newState.State, config: any) {
 
     2 - Luego de que el usuario te brinde la alcaldía, le preguntas por la colonia y luego por la calle y el número de condominio. cada pregunta por separado continuas hasta obtener los datos para consultar el seduvi con la herramienta 'obtener_seduvi'.
     3 - Una vez que obtengas la información del seduvi, le preguntas el nombre y si utiliza tanque estacionario o cilindro de gas.
-    4 - Una vez conusltado el seduvi y el nombre del usuario, le pides la calle de su domicilio y el número de puerta.
+    4 - Una vez conusltado el seduvi y el nombre del usuario, le pides el piso , el departamento y el telefono, de a uno por vez. (recuerda que ya tienes la calle y el número de casa cuando consultaste el seduvi, por lo que no es necesario volver a preguntar por esos datos).
     5 - Cuando te da el domicilio y número de puerta realizas la siguiente acción:
     - Le dices que vas a consultar si su domicilio es apto para tener acceso al gas naturtal, que espere un momento...
     6 - Le dices: 'enhorabuena porque hemos comprobado que su domicilio es apto para tener Gas Natural'.
@@ -548,10 +556,24 @@ async function callModel(state: typeof newState.State, config: any) {
     ### INFORMACIÓN SOBRE HERRAMIENTAS DISPONIBLES:
     
     - name: "obtener_seduvi"
-        descriptcon: "Obtiene la información del seduvi según la información brindada por el usuario."
+        descripcion: "Obtiene la información del seduvi según la información brindada por el usuario."
+        recopila la siguiente información:
+        - Alcaldía
+        - Colonia
+        - Calle
+        - Numero de condominio
 
     - name: "crear_visita"
       descripcion: "Crear una visita para la solicitud del servicio del usuario."
+      recopila la siguiente información:
+      - Horario: días y horario disponible para ser visitado.
+      - Nombre: nombre del usuario (esto puede ser capturado al inicio de la conversación, cuando lo saluda). 'No le pidas nombre completo, solo nombre'
+      - Observación (opcional): alguna observación que necesite hacer (si no anda el timbre, color de la puerta, que le avise al portero del edificio, etc.).
+      - numero de casa: número de casa del usuario que ya tienes cuando consultaste el seduvi, no le vuelvas a preguntar por el número.
+      - calle: calle del usuario que ya tienes cuando consultaste el seduvi, no le vuelvas a preguntar por la calle.
+      - piso: piso del usuario
+      - departamento: departamento del usuario
+
         
       ### Regla estricta para las herramientas:
        ### Los datos a recopilar siempre preguntalos de a uno por vez, y no le pidas todos los datos juntos, ya que el usuario se puede confundir.
@@ -563,8 +585,9 @@ async function callModel(state: typeof newState.State, config: any) {
     1 - Volver a pedirle los datos al usuario para que los corrija.
     2 - Tal vez no tenga datos, o los tenga incorrectos o no esté registrado el edificio.
     
-    - En cualquier escenario que se presente de no recibir la información del seduvi, debes proceder a pedirle el domicilio.
-    - En ésta instancia solo calle y número de casa.
+    - En cualquier escenario que se presente de no recibir la información del seduvi, debes proceder a preguntarle al usuario si quiere coordinar una visita para la solicitud del servicio.
+    - En ésta instancia solo piso, departamento y telefono.
+    - Si no quiere dar el teléfono le dices que no hay problema, pero que es importante para el contacto de la person que va a visitarlo/a.
     - Le dices que vas a consultar disponibilidad y que espere un momento
     - (simulas una busqueda de disponibilidad y le dices que ya tienes la información)
     - Le dices que su domicilio es apto para recibir el servicio de gas natural y le preguntas si quiere coordinar una visita para la solicitud del servicio.
@@ -573,8 +596,7 @@ async function callModel(state: typeof newState.State, config: any) {
     - horario 
     - piso 
     - departamento 
-    - numero_de_casa 
-    - nombre 
+    - nombre (si es que ya no lo tienes)
     - Telefono
     - Observaciones (si no anda el timbre, color de la puerta, que le avise al portero del edificio, etc.)
     
@@ -585,23 +607,21 @@ async function callModel(state: typeof newState.State, config: any) {
         *imporante que el numero de la casa puede o no ser el mismo que numero de condominio que brindo el usuario para la consulta del seduvi. confirmarlo con el usuario*
     
     
-    ### INPUTS PARA LAS HERRAMIENTAS:
+    ### REGLAS DE OBTENCION DE DATOS DEL USUARIO:
+    - Los datos que vas  recopilando no vuelvas a preguintarle por ellos, ya que los vas a ir guardando en el state de la conversación.
 
-    informacion a recopilar de la herramienta 'obtener_seduvi':
+    ### REGLAS ANTES DE CREAR LA VISITA:
+    - Muestrale al ussario la información sobre su domicilio antes de crear la visita y pidele que la confirme.
+    - Si la información no es correcta, vuelve a preguntarle por los datos que no son correctos y luego de corregirlos, creas la visita.
 
-    - Alcaldía
-    - Colonia
-    - Numero de condominio
-    - Calle
+    ### REGLAS AL FINALIZAR LA CONVERSACION:
+    - Al finalizar la conversacion muestrale al usuario este mensaje:
+
+     ¿Te gustó lo fácil que fue contratar el gas? 🙂
+     Comparte este enlace con tus vecinos y amigos 👉 https://chatbots.techbank.ai/faceapp/
+     ¡Ayúdales a decirle adiós al tanque y pasarse al gas natural sin líos! 🔥🏡
+
     
-    Información que debe recopilar la herramienta "crear_visita" luego de haber consultado el seduvi:
-    
-    - Horario: días y horario disponible para ser visitado.
-    - Nombre: nombre del usuario (esto puede ser capturado al inicio de la conversación, cuando lo saluda). 'No le pidas nombre completo, solo nombre'
-    - Observación: alguna observación que necesite hacer (si no anda el timbre, color de la puerta, que le avise al portero del edificio, etc.).
-    - numero de casa: número de casa del usuario 
-    - piso: piso del usuario 
-    - departamento: departamento del usuario 
     
    
   
@@ -621,9 +641,6 @@ async function callModel(state: typeof newState.State, config: any) {
 
   console.log(state.info_seduvi);
   console.log(state.info_visita);
-
- 
-
 
   const cadenaJSON = JSON.stringify(messages);
   // Tokeniza la cadena y cuenta los tokens
