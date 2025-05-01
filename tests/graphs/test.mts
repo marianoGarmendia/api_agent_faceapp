@@ -245,127 +245,127 @@ export const InmuebleSchema = z.object({
   precio: z.number().nullable(),
 });
 
-const objetoMongoPorperties = {
-  agente: "M&M .",
+// const objetoMongoPorperties = {
+//   agente: "M&M .",
 
-  alrededores:
-    "Bus:\nTren:\nPolideportivo:\nParque Público:\nZona Comercial:\nPuerto Deportivo:\nCampo de Fútbol:\nPiscina Pública:\nUniversidad:\nGimnasio:\nEscuela Internacional:\nEscuela Pública:\nGuardería:\nRestaurantes:\nHotel:\nHospital:\nAeropuerto:\nCentro Comercial:\nBancos:\nColegios:\nBiblioteca:\nBuen acceso a carretera:\nCercano al pueblo:",
+//   alrededores:
+//     "Bus:\nTren:\nPolideportivo:\nParque Público:\nZona Comercial:\nPuerto Deportivo:\nCampo de Fútbol:\nPiscina Pública:\nUniversidad:\nGimnasio:\nEscuela Internacional:\nEscuela Pública:\nGuardería:\nRestaurantes:\nHotel:\nHospital:\nAeropuerto:\nCentro Comercial:\nBancos:\nColegios:\nBiblioteca:\nBuen acceso a carretera:\nCercano al pueblo:",
 
-  amueblado: "Completamente Amueblado",
+//   amueblado: "Completamente Amueblado",
 
-  banios: 0,
+//   banios: 0,
 
-  caracteristicas: [
-    "Planta 3",
-    "Jardin",
-    "2da. Mano",
-    "Buen Estado",
-    "Comunidad: 0",
-    "Climatización: a/a f/c",
-    "Ventanas: Aluminio",
-    "Agua caliente: Gas Natural",
-    "Cocina: Independiente",
-    "Ubicación: Playa - 1ª Línea",
-  ],
+//   caracteristicas: [
+//     "Planta 3",
+//     "Jardin",
+//     "2da. Mano",
+//     "Buen Estado",
+//     "Comunidad: 0",
+//     "Climatización: a/a f/c",
+//     "Ventanas: Aluminio",
+//     "Agua caliente: Gas Natural",
+//     "Cocina: Independiente",
+//     "Ubicación: Playa - 1ª Línea",
+//   ],
 
-  circunstancia: "No Disponible",
+//   circunstancia: "No Disponible",
 
-  ciudad: "Gava",
+//   ciudad: "Gava",
 
-  climatizacion: "a/a f/c",
+//   climatizacion: "a/a f/c",
 
-  cocina: "Independiente",
+//   cocina: "Independiente",
 
-  codigo_postal: 8850,
+//   codigo_postal: 8850,
 
-  construccion_nueva: 0,
+//   construccion_nueva: 0,
 
-  direccion: "Calle Blanes, 1",
+//   direccion: "Calle Blanes, 1",
 
-  dormitorios: 0,
+//   dormitorios: 0,
 
-  emisiones: 0,
+//   emisiones: 0,
 
-  estado: "No Disponible",
+//   estado: "No Disponible",
 
-  estgen: "Buen Estado",
+//   estgen: "Buen Estado",
 
-  fecha_alta: "2024-01-11 00:00:00",
+//   fecha_alta: "2024-01-11 00:00:00",
 
-  freq_precio: "month",
+//   freq_precio: "month",
 
-  "geolocalizacion.latitude": 41.268378,
+//   "geolocalizacion.latitude": 41.268378,
 
-  "geolocalizacion.longitude": 2.026464,
+//   "geolocalizacion.longitude": 2.026464,
 
-  id: 3121,
+//   id: 3121,
 
-  m2constr: 125,
+//   m2constr: 125,
 
-  m2terraza: 14,
+//   m2terraza: 14,
 
-  m2utiles: 90,
+//   m2utiles: 90,
 
-  moneda: "EUR",
+//   moneda: "EUR",
 
-  nascensor: 0,
+//   nascensor: 0,
 
-  ntrasteros: 0,
+//   ntrasteros: 0,
 
-  num_inmueble: 1,
+//   num_inmueble: 1,
 
-  num_pisos_bloque: 0,
+//   num_pisos_bloque: 0,
 
-  num_pisos_edificio: 0,
+//   num_pisos_edificio: 0,
 
-  num_planta: "3ª Planta",
+//   num_planta: "3ª Planta",
 
-  num_terrazas: 0,
+//   num_terrazas: 0,
 
-  pais: "spain",
+//   pais: "spain",
 
-  piscina: 1,
+//   piscina: 1,
 
-  precio: 2700,
+//   precio: 2700,
 
-  "propietario.apellido": "Llauradó",
+//   "propietario.apellido": "Llauradó",
 
-  "propietario.codigo": 68,
+//   "propietario.codigo": 68,
 
-  "propietario.comercial": "M&M .",
+//   "propietario.comercial": "M&M .",
 
-  "propietario.fecha_alta": "15/12/2023",
+//   "propietario.fecha_alta": "15/12/2023",
 
-  "propietario.nombre": "Josep",
+//   "propietario.nombre": "Josep",
 
-  "propietario.telefono_movil": 636972777,
+//   "propietario.telefono_movil": 636972777,
 
-  provincia: "Barcelona",
+//   provincia: "Barcelona",
 
-  puerta: 0,
+//   puerta: 0,
 
-  ref: 3109,
+//   ref: 3109,
 
-  situacion: "2da. Mano",
+//   situacion: "2da. Mano",
 
-  "superficie.built": 125,
+//   "superficie.built": 125,
 
-  "superficie.plot": 0,
+//   "superficie.plot": 0,
 
-  tipo: "apartamento",
+//   tipo: "apartamento",
 
-  tipo_operacion: "Alquiler",
+//   tipo_operacion: "Alquiler",
 
-  tipo_via: "Calle",
+//   tipo_via: "Calle",
 
-  ubicacion: "Playa - 1ª Línea",
+//   ubicacion: "Playa - 1ª Línea",
 
-  ventana: "Aluminio",
+//   ventana: "Aluminio",
 
-  zona: "Gava Mar",
+//   zona: "Gava Mar",
 
-  zonascomunes: "Baloncesto:\nCentro de ocio:",
-};
+//   zonascomunes: "Baloncesto:\nCentro de ocio:",
+// };
 
 const model = new ChatOpenAI({
   model: "gpt-4o",
@@ -377,34 +377,34 @@ const model = new ChatOpenAI({
 
 
 
-const modelStructured = model.withStructuredOutput(InmuebleSchema);
+// const modelStructured = model.withStructuredOutput(InmuebleSchema);
 
-const query = `Hola, busco un piso de mas de 2 dormitorios, con piscina, de un valor entre 100 mil y 170 mil euros, en la zona de Gava Mar, que no tenga menos de 230 m2 construidos y que sea de nueva construccion, y si tiene terraza mejor, pero no es necesario.`;
+// const query = `Hola, busco un piso de mas de 2 dormitorios, con piscina, de un valor entre 100 mil y 170 mil euros, en la zona de Gava Mar, que no tenga menos de 230 m2 construidos y que sea de nueva construccion, y si tiene terraza mejor, pero no es necesario.`;
 
-const prompt = `Segun la siguiente consulta del ususario dame una respuesta estructurada segun el schema indicado.
+// const prompt = `Segun la siguiente consulta del ususario dame una respuesta estructurada segun el schema indicado.
 
-CONSULTA DEL USUARIO: ${query}
+// CONSULTA DEL USUARIO: ${query}
 
-### INSTRUCCIONES DE RESPUESTA:
-- LOS VALORES QUE NO TE BRINDE EL USUARIO DEBES DEJARLOS EN NULL
-- NO COMPLETES CAMPOS SIN INFORMACIÓN DEL USUARIO
+// ### INSTRUCCIONES DE RESPUESTA:
+// - LOS VALORES QUE NO TE BRINDE EL USUARIO DEBES DEJARLOS EN NULL
+// - NO COMPLETES CAMPOS SIN INFORMACIÓN DEL USUARIO
 
-`;
+// `;
 
 // const responseStructured = await modelStructured.invoke(prompt);
 
-const AtributoSchema = z.enum([
-  "construccion_nueva",
-  "dormitorios",
-  "banios",
-  "m2constr",
-  "m2terraza",
-  "m2utiles",
-  "nascensor",
-  "num_terrazas",
-  "piscina",
-  "precio",
-]);
+// const AtributoSchema = z.enum([
+//   "construccion_nueva",
+//   "dormitorios",
+//   "banios",
+//   "m2constr",
+//   "m2terraza",
+//   "m2utiles",
+//   "nascensor",
+//   "num_terrazas",
+//   "piscina",
+//   "precio",
+// ]);
 
 // Definimos los operadores permitidos directamente como un conjunto de literales
 
@@ -447,27 +447,27 @@ console.log("type: ",typeof responseQuerySchema);
 
 
 
-const promptQueryMongo = `
-     ' Eres un agente generador de filtros en el formato que usa MongoDB. Sigue en forma estricta las siguientes instrucciones al generar los filtros:'
-    '- Incluye únicamente los metadatos que se encuentren en la query y que se correlacionen con alguno de lista siguiente:" + ", ".join(interface["keys"]) +
-    "- Utiliza exclusivamente los siguientes operadores:" + ", ".join(interface["operators"]) + ". No uses otros operadores."
-    "- Siempre que la query incluya cantidades, usa los operadores de comparación adecuados para cada tipo de dato. Por ejemplo, si la query incluye números, usa $gt, $lt, o $eq"
-    '- Nunca compares con booleanos (True, False). En su lugar usa $gt 0 si el atributo existe."
-    '- Siempre devuelve un diccionario serializado, sin incluir el formato. Nada más.'
+// const promptQueryMongo = `
+//      ' Eres un agente generador de filtros en el formato que usa MongoDB. Sigue en forma estricta las siguientes instrucciones al generar los filtros:'
+//     '- Incluye únicamente los metadatos que se encuentren en la query y que se correlacionen con alguno de lista siguiente:" + ", ".join(interface["keys"]) +
+//     "- Utiliza exclusivamente los siguientes operadores:" + ", ".join(interface["operators"]) + ". No uses otros operadores."
+//     "- Siempre que la query incluya cantidades, usa los operadores de comparación adecuados para cada tipo de dato. Por ejemplo, si la query incluye números, usa $gt, $lt, o $eq"
+//     '- Nunca compares con booleanos (True, False). En su lugar usa $gt 0 si el atributo existe."
+//     '- Siempre devuelve un diccionario serializado, sin incluir el formato. Nada más.'
 
-    Keys validos = "banios",
-                    "construccion_nueva",
-                    "dormitorios",
-                    "m2constr",
-                    "m2terraza",
-                    "m2utiles",
-                    "nascensor",
-                    "num_terrazas",
-                    "piscina",
-                    "precio",
+//     Keys validos = "banios",
+//                     "construccion_nueva",
+//                     "dormitorios",
+//                     "m2constr",
+//                     "m2terraza",
+//                     "m2utiles",
+//                     "nascensor",
+//                     "num_terrazas",
+//                     "piscina",
+//                     "precio",
     
-    Consulta del usuario: ${query}
-    `;
+//     Consulta del usuario: ${query}
+//     `;
 
 // const responseQuery = await model.invoke(promptQueryMongo);
 
