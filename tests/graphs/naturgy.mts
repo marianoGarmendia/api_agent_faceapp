@@ -38,8 +38,8 @@ import { encode } from "gpt-3-encoder";
 // let info_visita={};
 
 // process.env.LANGCHAIN_CALLBACKS_BACKGROUND = "true";
-// import * as dotenv from "dotenv";
-// dotenv.config();
+import * as dotenv from "dotenv";
+dotenv.config();
 
 // const params = {
 //   alcaldia: "MIGUEL HIDALGO",
@@ -81,7 +81,7 @@ const crearVisita = async (
   const state = await workflow.getState(config);
 
   const id_visita = state.values.info_visita?.ID_VISITA;
-  const reference = config.configurable?.reference;
+  const reference = config?.configurable?.reference;
 
   console.log("id seduvi en crear visita", id);
   console.log("id visita en crear visita", id_visita);
@@ -198,7 +198,7 @@ const obtener_seduvi = tool(
     const baseUrl = "https://faceapp.techbank.ai:4001/public/places";
     // let config = { configurable: { thread_id: thread_id } };
     const state = await workflow.getState({
-      configurable: { thread_id: config.configurable.thread_id },
+      configurable: { thread_id: config?.configurable.thread_id },
     });
 
     console.log(config);
@@ -347,7 +347,7 @@ const crear_visita = tool(
       return "Faltan datos para coordinar la visita, ayuda al usuario a completar la inforacion faltante e indicale cuals son los datos que faltan para coordinar la visita";
 
     const state = await workflow.getState({
-      configurable: { thread_id: config.configurable.thread_id },
+      configurable: { thread_id: config?.configurable.thread_id },
     });
 
     console.log(
@@ -460,7 +460,7 @@ const toolNode = new ToolNode(tools);
 
 async function callModel(state: typeof newState.State, config: any) {
   const { messages } = state;
-  const threadId = config.configurable?.thread_id;
+  const threadId = config?.configurable?.thread_id;
   console.log("Thread ID:", threadId);
   state.thread_id = threadId;
 

@@ -3,7 +3,7 @@ import { StateGraph, Annotation } from "@langchain/langgraph";
 export const graph = async (config: {
   configurable?: { nodeName: string };
 }) => {
-  const node = config.configurable?.nodeName ?? "default";
+  const node = config?.configurable?.nodeName ?? "default";
 
   const state = Annotation.Root({
     node: Annotation<string>,
