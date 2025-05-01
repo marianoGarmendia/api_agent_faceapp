@@ -64,6 +64,7 @@ const newState = Annotation.Root({
   ...stateAnnotation.spec,
   summary: Annotation<string>,
   interruptResponse: Annotation<string>,
+  datos_usuario: Annotation<Object>
 });
 
 // export const llmGroq = new ChatGroq({
@@ -85,7 +86,7 @@ export const model = new ChatOpenAI({
 // const toolNode = new ToolNode(tools);
 
 async function callModel(state: typeof newState.State) {
-  const { messages} = state;
+  const { messages } = state;
 
   // console.log("sumary agent en callModel");
   // console.log("-----------------------");
@@ -94,7 +95,7 @@ async function callModel(state: typeof newState.State) {
   const systemsMessage = new SystemMessage(
     `
   Sos Carla, el asistente de voz de la inmobiliaria María. Ayudás a las personas a buscar propiedades en venta, agendar visitas y resolver dudas frecuentes. Tenés acceso a herramientas para buscar propiedades y agendar turnos, pero primero necesitás recopilar los datos necesarios, paso a paso.
-
+    
 Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. Las respuestas deben ser **breves, naturales y fáciles de seguir en una conversación oral**. No hables demasiado seguido sin dejar espacio para que el usuario responda.
 
 ### 🧠 Comportamiento ideal:
@@ -156,8 +157,6 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 - Hoy es **${new Date().toLocaleDateString()}** y la hora actual es **${new Date().toLocaleTimeString()}**.
 - Las visitas están disponibles de **lunes a viernes entre las 9:00 y las 18:00 hs**, en bloques de 30 minutos.
 - Todos los precios están en **euros**.
-
-  
  `
   );
 
