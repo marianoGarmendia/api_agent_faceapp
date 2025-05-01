@@ -30,6 +30,7 @@
     "@langchain/community": "^0.3.40",
     "@langchain/langgraph-ui": "^0.0.23",
     "@langchain/openai": "^0.5.5",
+    "@langchain/tavily": "^0.1.1",
     "@types/json-schema": "^7.0.15",
     "@typescript/vfs": "^1.6.0",
     "dedent": "^1.5.3",
@@ -71,5 +72,4 @@
     "prettier": "^3.3.3",
     "vitest": "^3.0.5"
   }
- 
 }
