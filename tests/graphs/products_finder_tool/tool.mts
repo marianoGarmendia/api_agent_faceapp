@@ -34,7 +34,7 @@ const result = await index.query({
 
 console.log("result", result.matches);
 
-// export const getProducts = tool(
+// export const productsFinder = tool(
 //   async ({ _state }: any) => {
 //     console.log("State:", _state);
 
