@@ -4,10 +4,7 @@ import dotenv from "dotenv";
 import { z } from "zod";
 import { buildFilter } from "./helpers.mjs";
 import { embeddingModel } from "./models.mjs";
-import {
-  buildQueryFilterModel,
-  buildQuerySchema
-} from "./schemas.mjs";
+import { buildQueryFilterModel, buildQuerySchema } from "./schemas.mjs";
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
@@ -34,36 +31,34 @@ const findProducts = async (prompt: string, props: string[]) => {
   return result.matches;
 };
 
+const BASE_URL = "https://propiedades.winwintechbank.com/#/producto";
+const buildUrl = (id: string | number) => `${BASE_URL}/${id}`;
+
 export const productsFinder = tool(
   async ({ prompt, props }) => {
-  
     try {
-      
-      const products = await findProducts(prompt, props);
-      let property = {} as any
+      const rawProducts = await findProducts(prompt, props);
+      const products = rawProducts.map((product) => ({
+        ...product.metadata,
+        id: product.id,
+        url: buildUrl(product.id),
+      }));
 
-      products.forEach((product, index) => {
-        property[index] = {
-          ...product.metadata || "",
-          id: product.metadata || "",
-        }
-      })
-
-      // llamada a la API de winwin para obtener los datos de la propiedad completa
-      const responseString = JSON.stringify(property, null, 2)
-      
-
-      return responseString;
+      return JSON.stringify(products);
     } catch (error) {
-      return "Ocurrió un error interno al procesar la búsqueda de propiedades.";
+      return "Ocurrió un error interno al procesar la búsqueda de productos.";
     }
   },
   {
     name: "products_finder",
     description: "Obtiene una lista de productos disponibles en el sistema",
     schema: z.object({
-      prompt: z.string().describe("Consulta del usuario sobre el producto buscado"),
-      props: z.array(z.string()).describe("Atributos del producto que se pueden filtrar"),
+      prompt: z
+        .string()
+        .describe("Consulta del usuario sobre el producto buscado"),
+      props: z
+        .array(z.string())
+        .describe("Atributos del producto que se pueden filtrar"),
     }),
   },
 );
