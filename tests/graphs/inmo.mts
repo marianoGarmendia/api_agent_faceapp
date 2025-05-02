@@ -33,6 +33,7 @@ import {
 // import { getUniversalFaq, noticias_y_tendencias } from "./firecrawl";
 
 import { contexts } from "./contexts.mjs";
+import { INMUEBLE_PROPS } from "./products_finder/schemas.mjs";
 import { productsFinder } from "./products_finder/tools.mjs";
 
 
@@ -130,14 +131,14 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 - get_availability_Tool: para verificar horarios disponibles para visitas.
 - create_booking_tool: para agendar la visita.
 - "tavily_search": para consultar información del clima, actividades o puntos de interés de una zona.
-- "find_property": para buscar propiedades en venta y obtener información sobre ellas según la consulta del usuario.
+- "products_finder": para buscar propiedades en venta y obtener información sobre ellas según la consulta del usuario.
 
 
 
 ---
 
 ### REGLAS PARA RECOPILACION DE INFORMACION PARA HERRAMIENTAS
-- "find_property" (para buscar propiedades en venta y obtener información sobre ellas según la consulta del usuario):
+- "products_finder" (para buscar propiedades en venta y obtener información sobre ellas según la consulta del usuario):
 - query: string (consulta del usuario sobre la propiedad buscada).
 - Para armar la consulta, tené en cuenta lo siguiente:
 - número de habitaciones, ubicacion, metros cuadrados, piscina, precio aproximado
@@ -337,9 +338,9 @@ const toolNodo = async (state: typeof newState.State) => {
     } else if (toolName === "create_booking_tool") {
       const res = await createbookingTool.invoke(toolArgs);
       toolMessage = new ToolMessage(res, tool_call_id, "create_booking_tool");
-    }else if (toolName === "find_property") {
-      const res = await productsFinder.invoke(toolArgs);
-      toolMessage = new ToolMessage(res, tool_call_id, "find_property");
+    }else if (toolName === "products_finder") {
+      const res = await productsFinder.invoke({prompt: toolArgs.query, props: INMUEBLE_PROPS});
+      toolMessage = new ToolMessage(res, tool_call_id, "products_finder");
     }
   } else {
     return { messages };

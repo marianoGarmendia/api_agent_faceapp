@@ -1,18 +1,13 @@
 import { tool } from "@langchain/core/tools";
-import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
 import { Pinecone } from "@pinecone-database/pinecone";
 import dotenv from "dotenv";
-import {  z } from "zod";
+import { z } from "zod";
 import { buildFilter } from "./helpers.mjs";
 import { embeddingModel } from "./models.mjs";
 import {
   buildQueryFilterModel,
-  buildQuerySchema,
-  INMUEBLE_PROPS,
+  buildQuerySchema
 } from "./schemas.mjs";
-import { log } from "util";
-
-
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
 });
@@ -20,11 +15,9 @@ const pinecone = new Pinecone({
 dotenv.config();
 
 const INDEX_NAME = "products";
-const index = pinecone.Index(INDEX_NAME); // se pueden agrupar por namespaces. De momento solo esta Default .namespace("propiedades"). Cuando haya varios, tambien se tomara el index dinamicamente
+const index = pinecone.Index(INDEX_NAME);
 
 const findProducts = async (prompt: string, props: string[]) => {
-  // aqui se construyen el schema de consulta y el modelo de filtro a partir de las propiedades, en forma dinamica
-  // hoy son las propiedades, pero podria ser cualquier otro tipo de producto
   const querySchema = buildQuerySchema(props);
   const queryFilterModel = buildQueryFilterModel(querySchema);
  
@@ -55,24 +48,12 @@ const findProducts = async (prompt: string, props: string[]) => {
   return result.matches;
 };
 
-// const products = await findProducts(
-//   "busco una casa en venta con 2 baños, mas de 2 dormitorios y entre 100mil y 300mil euros",
-//   INMUEBLE_PROPS,
-// );
-
-// console.log("products", products);
-
 export const productsFinder = tool(
-  async ({ query }) => {
-   
-    // aqui se obtiene la consulta del usuario. En este caso es un string, pero puede ser cualquier otro tipo de dato
-    const props = INMUEBLE_PROPS; // de momento lo definimos aqui. Este array deberia obtenerse dinamicamente de acuerdo al tipo de producto que se busque
-
-    // aqui se obtiene la consulta del usuario. En este caso es un string, pero puede ser cualquier otro tipo de dato
-
+  async ({ prompt, props }) => {
+  
     try {
       
-      const products = await findProducts(query, props);
+      const products = await findProducts(prompt, props);
       let property = {} as any
 
       products.forEach((product, index) => {
@@ -82,9 +63,7 @@ export const productsFinder = tool(
         }
       })
 
-
       // llamada a la API de winwin para obtener los datos de la propiedad completa
-          
       const responseString = JSON.stringify(property, null, 2)
       
 
@@ -94,28 +73,11 @@ export const productsFinder = tool(
     }
   },
   {
-    name: "find_property",
+    name: "products_finder",
     description: "Obtiene una lista de productos disponibles en el sistema",
     schema: z.object({
-      query: z.string().describe("Consulta del usuario sobre la propiedad buscada"),
+      prompt: z.string().describe("Consulta del usuario sobre el producto buscado"),
+      props: z.array(z.string()).describe("Atributos del producto que se pueden filtrar"),
     }),
   },
 );
-
-
-
-
-
-
-const stateAnnotation = MessagesAnnotation;
-const toolState = Annotation.Root({
-  ...stateAnnotation.spec
-});
-
-export const toolNode = async (state: typeof toolState.State) => {
-  const { messages } = state;
-  console.log({messages})
-  const lastMessage = messages.at(-1);
-  console.log({lastMessage})
-  return { messages: [...messages, lastMessage] };
-};

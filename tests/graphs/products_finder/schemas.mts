@@ -2,7 +2,6 @@ import { fromPairs } from "lodash-es";
 import z, { ZodSchema } from "zod";
 import { chatModel } from "./models.mjs";
 
-// de momento lo definimos aqui. Este array deberia obtenerse dinamicamente de acuerdo al tipo de producto que se busque
 export const INMUEBLE_PROPS = [
   "banios",
   "dormitorios",
