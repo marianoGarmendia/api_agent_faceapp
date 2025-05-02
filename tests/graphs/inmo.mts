@@ -6,38 +6,34 @@ import {
 } from "@langchain/core/messages";
 import {
   ActionRequest,
-  HumanInterruptConfig,
   HumanInterrupt,
+  HumanInterruptConfig,
   HumanResponse,
 } from "@langchain/langgraph/prebuilt";
 // import { tool } from "@langchain/core/tools";
 // import { z } from "zod";
-import { ChatOpenAI } from "@langchain/openai";
-import { TavilySearch } from "@langchain/tavily";
 import {
-
+  Annotation,
+  END,
+  MemorySaver,
+  MessagesAnnotation,
   StateGraph,
   interrupt,
-  
-  END,
 } from "@langchain/langgraph";
-import {
-  MemorySaver,
-  Annotation,
-  MessagesAnnotation,
-} from "@langchain/langgraph";
+import { ChatOpenAI } from "@langchain/openai";
+import { TavilySearch } from "@langchain/tavily";
 // import { ToolNode } from "@langchain/langgraph/prebuilt";
-import {
-  pdfTool,
-  
-  getPisos2,
-} from "./pdf-loader_tool.mjs";
 import { encode } from "gpt-3-encoder";
 import { createbookingTool, getAvailabilityTool } from "./booking-cal.mjs";
+import {
+  getPisos2,
+  pdfTool,
+} from "./pdf-loader_tool.mjs";
 // import { ensureToolCallsHaveResponses } from "./ensure-tool-response.mjs";
 // import { getUniversalFaq, noticias_y_tendencias } from "./firecrawl";
 
 import { contexts } from "./contexts.mjs";
+import { productsFinder } from "./products_finder/tools.mjs";
 
 
 
@@ -56,7 +52,7 @@ const tavilySearch = new TavilySearch({
   name: "tavily_search",
 });
 
-const tools = [getPisos2, getAvailabilityTool, createbookingTool, tavilySearch];
+const tools = [getPisos2, getAvailabilityTool, createbookingTool, tavilySearch, productsFinder];
 
 const stateAnnotation = MessagesAnnotation;
 

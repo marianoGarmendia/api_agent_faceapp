@@ -1,5 +1,9 @@
-import dotenv from "dotenv";
+import { AIMessage } from "@langchain/core/messages";
+import { tool } from "@langchain/core/tools";
+import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
 import { Pinecone } from "@pinecone-database/pinecone";
+import dotenv from "dotenv";
+import { z } from "zod";
 import { buildFilter } from "./helpers.mjs";
 import { embeddingModel } from "./models.mjs";
 import {
@@ -7,9 +11,6 @@ import {
   buildQuerySchema,
   INMUEBLE_PROPS,
 } from "./schemas.mjs";
-import { tool } from "@langchain/core/tools";
-import { z } from "zod";
-import { AIMessage } from "@langchain/core/messages";
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
@@ -73,3 +74,16 @@ export const productsFinder = tool(
     schema: z.object({}),
   },
 );
+
+const stateAnnotation = MessagesAnnotation;
+const toolState = Annotation.Root({
+  ...stateAnnotation.spec
+});
+
+export const toolNode = async (state: typeof toolState.State) => {
+  const { messages } = state;
+  console.log({messages})
+  const lastMessage = messages.at(-1);
+  console.log({lastMessage})
+  return { messages: [...messages, lastMessage] };
+};
