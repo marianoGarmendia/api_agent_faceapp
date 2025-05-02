@@ -1,10 +1,15 @@
 import dotenv from "dotenv";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { buildFilter } from "./helpers.mjs";
-import { buildQueryFilterModel, embeddingModel } from "./models.mjs";
-import { buildQuerySchema, INMUEBLE_PROPS } from "./schemas.mjs";
+import { embeddingModel } from "./models.mjs";
+import {
+  buildQueryFilterModel,
+  buildQuerySchema,
+  INMUEBLE_PROPS,
+} from "./schemas.mjs";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
+import { AIMessage } from "@langchain/core/messages";
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
@@ -15,62 +20,51 @@ dotenv.config();
 const INDEX_NAME = "products";
 const index = pinecone.Index(INDEX_NAME);
 
-const props = INMUEBLE_PROPS;
-const querySchema = buildQuerySchema(props);
-const queryFilterModel = buildQueryFilterModel(querySchema);
+const findProducts = async (prompt: string, props: string[]) => {
+  const querySchema = buildQuerySchema(props);
+  const queryFilterModel = buildQueryFilterModel(querySchema);
+  const rawQueryFilter = await queryFilterModel.invoke(prompt);
+  const filter = buildFilter(rawQueryFilter);
+  console.log({ filter });
 
-const prompt = `busco una casa en venta con 2 baños, mas de 2 dormitorios y entre 100mil y 300mil euros`;
-const rawQueryFilter = await queryFilterModel.invoke(prompt);
-const filter = buildFilter(rawQueryFilter);
-console.log({ filter });
+  const embeddedPrompt = await embeddingModel.embedQuery(prompt);
+  const result = await index.query({
+    vector: embeddedPrompt,
+    topK: 5,
+    includeMetadata: true,
+    filter,
+  });
 
-const embeddedPrompt = await embeddingModel.embedQuery(prompt);
-const result = await index.query({
-  vector: embeddedPrompt,
-  topK: 5,
-  includeMetadata: true,
-  filter,
-});
+  return result.matches;
+};
 
-console.log("result", result.matches);
+const products = await findProducts(
+  "busco una casa en venta con 2 baños, mas de 2 dormitorios y entre 100mil y 300mil euros",
+  INMUEBLE_PROPS,
+);
 
-// export const productsFinder = tool(
-//   async ({ _state }: any) => {
-//     console.log("State:", _state);
+console.log("products", products);
 
-//     const props = INMUEBLE_PROPS;
-//     const querySchema = buildQuerySchema(props);
-//     const queryFilterModel = buildQueryFilterModel(querySchema);
+export const productsFinder = tool(
+  async ({ _state }: any) => {
+    console.log("State:", _state);
 
-//     try {
-//       const prompt = `busco una casa en venta con 2 baños, mas de 2 dormitorios y entre 100mil y 300mil euros`;
-//       const rawQueryFilter = await queryFilterModel.invoke(prompt);
-//       const filter = buildFilter(rawQueryFilter);
-//       console.log(rawQueryFilter);
-//       console.log({ filter });
+    const props = INMUEBLE_PROPS; // de momento lo definimos aqui. Este array deberia obtenerse dinamicamente de acuerdo al tipo de producto que se busque
 
-//       const embeddedPrompt = await embeddingModel.embedQuery(prompt);
-//       const result = await index.query({
-//         vector: embeddedPrompt,
-//         topK: 5,
-//         includeMetadata: true,
-//         filter,
-//       });
+    try {
+      const prompt = `busco una casa en venta con 2 baños, mas de 2 dormitorios y entre 100mil y 300mil euros`;
+      const products = await findProducts(prompt, props);
 
-//       console.log({ result });
-
-//       // return {
-//       //   messages: [new AIMessage(mappedResult.join(""))],
-//       // };
-
-//       return "Lamentablemente no hay propiedades que cumplan con los requisitos que busca.";
-//     } catch (error) {
-//       return "Ocurrió un error interno al procesar la búsqueda de propiedades.";
-//     }
-//   },
-//   {
-//     name: "getProducts",
-//     description: "Obtiene una lista de productos disponibles en el sistema",
-//     schema: z.object({}),
-//   },
-// );
+      return {
+        messages: [new AIMessage(products.join(""))],
+      };
+    } catch (error) {
+      return "Ocurrió un error interno al procesar la búsqueda de propiedades.";
+    }
+  },
+  {
+    name: "getProducts",
+    description: "Obtiene una lista de productos disponibles en el sistema",
+    schema: z.object({}),
+  },
+);

@@ -1,6 +1,5 @@
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import dotenv from "dotenv";
-import { ZodSchema } from "zod";
 dotenv.config();
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
@@ -13,13 +12,8 @@ export const embeddingModel = new OpenAIEmbeddings({
   dimensions: 512,
 });
 
-const chatModel = new ChatOpenAI({
+export const chatModel = new ChatOpenAI({
   model: "gpt-4o",
   apiKey: OPENAI_API_KEY,
   temperature: 0,
 });
-
-export const buildQueryFilterModel = (querySchema: ZodSchema) =>
-  chatModel.withStructuredOutput(querySchema, {
-    strict: false,
-  });
