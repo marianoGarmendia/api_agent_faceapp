@@ -173,9 +173,6 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 
   // console.log(`Número de tokens: ${numeroDeTokens}`);
 
-  console.log("------------");
-  console.log("messages: ", messages);
-
   return { messages: [...messages, response] };
 
   // console.log(messages, response);
@@ -283,7 +280,7 @@ interface pisosToolArgs {
 }
 
 const toolNodo = async (state: typeof newState.State) => {
-  const { messages, summary } = state;
+  const { messages } = state;
 
   const lastMessage = messages[messages.length - 1] as AIMessage;
   console.log("toolNodo");

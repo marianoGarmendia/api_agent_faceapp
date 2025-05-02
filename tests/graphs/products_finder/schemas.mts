@@ -39,7 +39,11 @@ export const buildQuerySchema = (props: string[]) =>
  * @param querySchema - Esquema de zod que define las propiedades y condiciones de la consulta.
  * @returns
  */
-export const buildQueryFilterModel = (querySchema: ZodSchema) =>
-  chatModel.withStructuredOutput(querySchema, {
+export const buildQueryFilterModel = (querySchema: ZodSchema) => 
+    chatModel.withStructuredOutput(querySchema, {
     strict: false,
   });
+
+  
+
+

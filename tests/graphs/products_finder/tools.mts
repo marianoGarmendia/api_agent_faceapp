@@ -5,7 +5,6 @@ import { z } from "zod";
 import { buildFilter } from "./helpers.mjs";
 import { embeddingModel } from "./models.mjs";
 import { buildQueryFilterModel, buildQuerySchema } from "./schemas.mjs";
-
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
 });
