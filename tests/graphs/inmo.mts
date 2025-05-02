@@ -172,8 +172,7 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 
   // console.log(`Número de tokens: ${numeroDeTokens}`);
 
-  console.log("------------");
-  console.log("messages: ", messages);
+  
   
 
   return { messages: [...messages, response] };

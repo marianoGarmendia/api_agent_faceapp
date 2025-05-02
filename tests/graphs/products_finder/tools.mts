@@ -1,9 +1,8 @@
-import { AIMessage } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
 import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
 import { Pinecone } from "@pinecone-database/pinecone";
 import dotenv from "dotenv";
-import { string, z } from "zod";
+import {  z } from "zod";
 import { buildFilter } from "./helpers.mjs";
 import { embeddingModel } from "./models.mjs";
 import {
@@ -11,7 +10,8 @@ import {
   buildQuerySchema,
   INMUEBLE_PROPS,
 } from "./schemas.mjs";
-import { J } from "vitest/dist/chunks/reporters.d.79o4mouw.js";
+import { log } from "util";
+
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
@@ -27,9 +27,19 @@ const findProducts = async (prompt: string, props: string[]) => {
   // hoy son las propiedades, pero podria ser cualquier otro tipo de producto
   const querySchema = buildQuerySchema(props);
   const queryFilterModel = buildQueryFilterModel(querySchema);
+ 
+  console.log("queryFilterModel", queryFilterModel);
   const rawQueryFilter = await queryFilterModel.invoke(prompt);
+  // esto esta llegando como mensaje de "ai" y se renderiza en el front, tengo que no renderizarlo o ver la manera de que no se ejecute aqui
+  
+  
+
+ 
+
 
   const filter = buildFilter(rawQueryFilter); // esta funcion ajusta el objeto de filtro para que sea como lo epsera Pinecone
+  console.log("filter", filter);
+  
   // console.log({ filter });
 
   // aqui se vectoriza la query del usuario y se consulta a Pinecone agregando el filtro construido
