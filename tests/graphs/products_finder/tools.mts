@@ -68,11 +68,13 @@ export const productsFinder = tool(
       products.forEach((product, index) => {
         property[index] = {
           ...product.metadata || "",
-          imgSrc: product.metadata?.imgSrc || "",
-          url: product.metadata?.url || "",
+          id: product.metadata || "",
         }
       })
-      
+
+
+      // llamada a la API de winwin para obtener los datos de la propiedad completa
+          
       const responseString = JSON.stringify(property, null, 2)
       
 
