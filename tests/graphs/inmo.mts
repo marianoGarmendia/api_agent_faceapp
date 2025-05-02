@@ -52,7 +52,7 @@ const tavilySearch = new TavilySearch({
   name: "tavily_search",
 });
 
-const tools = [getPisos2, getAvailabilityTool, createbookingTool, tavilySearch, productsFinder];
+const tools = [getAvailabilityTool, createbookingTool, tavilySearch, productsFinder];
 
 const stateAnnotation = MessagesAnnotation;
 
@@ -129,23 +129,23 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 - Obtener_pisos_en_venta_dos: para buscar propiedades en venta.
 - get_availability_Tool: para verificar horarios disponibles para visitas.
 - create_booking_tool: para agendar la visita.
-- tavily_search: para consultar información del clima, actividades o puntos de interés de una zona.
+- "tavily_search": para consultar información del clima, actividades o puntos de interés de una zona.
+- "find_property": para buscar propiedades en venta y obtener información sobre ellas según la consulta del usuario.
+
+
 
 ---
 
 ### REGLAS PARA RECOPILACION DE INFORMACION PARA HERRAMIENTAS
-- Para la herramienta **Obtener_pisos_en_venta_dos**:
-  
-    - **Habitaciones**: 1, 2, 3 o más.
-    - **Precio aproximado**: un rango de precios 
-    - **Zona**: nombre de la zona o barrio (ej: Gracia, Barcelona).
-    - **Superficie total**: en metros cuadrados (ej: entre 50 y 100 m2).
-    - **Piscina**: si o no.
-    - **Tipo de operación**: venta o alquiler.
+- "find_property" (para buscar propiedades en venta y obtener información sobre ellas según la consulta del usuario):
+- query: string (consulta del usuario sobre la propiedad buscada).
+- Para armar la consulta, tené en cuenta lo siguiente:
+- número de habitaciones, ubicacion, metros cuadrados, piscina, precio aproximado
+- Esa información debes detectarla de la consulta del ususario
+- intenta que esté lo mas completa posible antes de armar la "query" de consulta.
+- Si el usuario no proporciona toda la información, hacé preguntas para obtenerla. Por ejemplo: "¿Cuántas habitaciones necesitas?" o "¿Cuál es tu presupuesto aproximado?".
 
-    - Asegurate de ir recopilando de a un valor por vez, y no todos juntos
-    - Si al usuario le da lo mismo una caracteristica, o no tiene preferencia, le das valor "sin asignar"
-    - Una vez que tengas todos los valores continúa-
+
 
 ### ℹ️ Información adicional
 
@@ -172,7 +172,9 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 
   // console.log(`Número de tokens: ${numeroDeTokens}`);
 
-  // console.log("------------");
+  console.log("------------");
+  console.log("messages: ", messages);
+  
 
   return { messages: [...messages, response] };
 
@@ -336,6 +338,9 @@ const toolNodo = async (state: typeof newState.State) => {
     } else if (toolName === "create_booking_tool") {
       const res = await createbookingTool.invoke(toolArgs);
       toolMessage = new ToolMessage(res, tool_call_id, "create_booking_tool");
+    }else if (toolName === "find_property") {
+      const res = await productsFinder.invoke(toolArgs);
+      toolMessage = new ToolMessage(res, tool_call_id, "find_property");
     }
   } else {
     return { messages };

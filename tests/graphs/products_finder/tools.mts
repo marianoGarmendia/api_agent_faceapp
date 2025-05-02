@@ -3,7 +3,7 @@ import { tool } from "@langchain/core/tools";
 import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
 import { Pinecone } from "@pinecone-database/pinecone";
 import dotenv from "dotenv";
-import { z } from "zod";
+import { string, z } from "zod";
 import { buildFilter } from "./helpers.mjs";
 import { embeddingModel } from "./models.mjs";
 import {
@@ -11,6 +11,7 @@ import {
   buildQuerySchema,
   INMUEBLE_PROPS,
 } from "./schemas.mjs";
+import { J } from "vitest/dist/chunks/reporters.d.79o4mouw.js";
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
@@ -29,7 +30,7 @@ const findProducts = async (prompt: string, props: string[]) => {
   const rawQueryFilter = await queryFilterModel.invoke(prompt);
 
   const filter = buildFilter(rawQueryFilter); // esta funcion ajusta el objeto de filtro para que sea como lo epsera Pinecone
-  console.log({ filter });
+  // console.log({ filter });
 
   // aqui se vectoriza la query del usuario y se consulta a Pinecone agregando el filtro construido
   // asi filtramos primero con la query estructurada (el filtro) y luego con la query vectorizada (busqueda semantica)
@@ -44,36 +45,55 @@ const findProducts = async (prompt: string, props: string[]) => {
   return result.matches;
 };
 
-const products = await findProducts(
-  "busco una casa en venta con 2 baños, mas de 2 dormitorios y entre 100mil y 300mil euros",
-  INMUEBLE_PROPS,
-);
+// const products = await findProducts(
+//   "busco una casa en venta con 2 baños, mas de 2 dormitorios y entre 100mil y 300mil euros",
+//   INMUEBLE_PROPS,
+// );
 
-console.log("products", products);
+// console.log("products", products);
 
 export const productsFinder = tool(
-  async ({ _state }: any) => {
-    console.log("State:", _state);
-
+  async ({ query }) => {
+   
+    // aqui se obtiene la consulta del usuario. En este caso es un string, pero puede ser cualquier otro tipo de dato
     const props = INMUEBLE_PROPS; // de momento lo definimos aqui. Este array deberia obtenerse dinamicamente de acuerdo al tipo de producto que se busque
 
-    try {
-      const prompt = `busco una casa en venta con 2 baños, mas de 2 dormitorios y entre 100mil y 300mil euros`;
-      const products = await findProducts(prompt, props);
+    // aqui se obtiene la consulta del usuario. En este caso es un string, pero puede ser cualquier otro tipo de dato
 
-      return {
-        messages: [new AIMessage(products.join(""))],
-      };
+    try {
+      
+      const products = await findProducts(query, props);
+      let property = {} as any
+
+      products.forEach((product, index) => {
+        property[index] = {
+          ...product.metadata || "",
+          imgSrc: product.metadata?.imgSrc || "",
+          url: product.metadata?.url || "",
+        }
+      })
+      
+      const responseString = JSON.stringify(property, null, 2)
+      
+
+      return responseString;
     } catch (error) {
       return "Ocurrió un error interno al procesar la búsqueda de propiedades.";
     }
   },
   {
-    name: "getProducts",
+    name: "find_property",
     description: "Obtiene una lista de productos disponibles en el sistema",
-    schema: z.object({}),
+    schema: z.object({
+      query: z.string().describe("Consulta del usuario sobre la propiedad buscada"),
+    }),
   },
 );
+
+
+
+
+
 
 const stateAnnotation = MessagesAnnotation;
 const toolState = Annotation.Root({
