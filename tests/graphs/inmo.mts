@@ -6,40 +6,32 @@ import {
 } from "@langchain/core/messages";
 import {
   ActionRequest,
-  HumanInterruptConfig,
   HumanInterrupt,
+  HumanInterruptConfig,
   HumanResponse,
 } from "@langchain/langgraph/prebuilt";
 // import { tool } from "@langchain/core/tools";
 // import { z } from "zod";
-import { ChatOpenAI } from "@langchain/openai";
-import { TavilySearch } from "@langchain/tavily";
 import {
-
+  Annotation,
+  END,
+  MemorySaver,
+  MessagesAnnotation,
   StateGraph,
   interrupt,
-  
-  END,
 } from "@langchain/langgraph";
-import {
-  MemorySaver,
-  Annotation,
-  MessagesAnnotation,
-} from "@langchain/langgraph";
+import { ChatOpenAI } from "@langchain/openai";
+import { TavilySearch } from "@langchain/tavily";
 // import { ToolNode } from "@langchain/langgraph/prebuilt";
-import {
-  pdfTool,
-  
-  getPisos2,
-} from "./pdf-loader_tool.mjs";
 import { encode } from "gpt-3-encoder";
 import { createbookingTool, getAvailabilityTool } from "./booking-cal.mjs";
+import { getPisos2, pdfTool } from "./pdf-loader_tool.mjs";
 // import { ensureToolCallsHaveResponses } from "./ensure-tool-response.mjs";
 // import { getUniversalFaq, noticias_y_tendencias } from "./firecrawl";
 
 import { contexts } from "./contexts.mjs";
-
-
+import { INMUEBLE_PROPS } from "./products_finder/schemas.mjs";
+import { productsFinder } from "./products_finder/tools.mjs";
 
 export const empresa = {
   eventTypeId: contexts.clinica.eventTypeId,
@@ -52,11 +44,17 @@ export const empresa = {
 
 const tavilySearch = new TavilySearch({
   tavilyApiKey: process.env.TAVILY_API_KEY,
-  description: "Herramienta para buscar colegios, escuelas, clubes, ubicacion del mar , y relacionarlo con la zona de la propiedad",
+  description:
+    "Herramienta para buscar colegios, escuelas, clubes, ubicacion del mar , y relacionarlo con la zona de la propiedad",
   name: "tavily_search",
 });
 
-const tools = [getPisos2, getAvailabilityTool, createbookingTool, tavilySearch];
+const tools = [
+  getAvailabilityTool,
+  createbookingTool,
+  tavilySearch,
+  productsFinder,
+];
 
 const stateAnnotation = MessagesAnnotation;
 
@@ -85,7 +83,7 @@ export const model = new ChatOpenAI({
 // const toolNode = new ToolNode(tools);
 
 async function callModel(state: typeof newState.State) {
-  const { messages} = state;
+  const { messages } = state;
 
   // console.log("sumary agent en callModel");
   // console.log("-----------------------");
@@ -133,23 +131,23 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 - Obtener_pisos_en_venta_dos: para buscar propiedades en venta.
 - get_availability_Tool: para verificar horarios disponibles para visitas.
 - create_booking_tool: para agendar la visita.
-- tavily_search: para consultar información del clima, actividades o puntos de interés de una zona.
+- "tavily_search": para consultar información del clima, actividades o puntos de interés de una zona.
+- "products_finder": para buscar propiedades en venta y obtener información sobre ellas según la consulta del usuario.
+
+
 
 ---
 
 ### REGLAS PARA RECOPILACION DE INFORMACION PARA HERRAMIENTAS
-- Para la herramienta **Obtener_pisos_en_venta_dos**:
-  
-    - **Habitaciones**: 1, 2, 3 o más.
-    - **Precio aproximado**: un rango de precios 
-    - **Zona**: nombre de la zona o barrio (ej: Gracia, Barcelona).
-    - **Superficie total**: en metros cuadrados (ej: entre 50 y 100 m2).
-    - **Piscina**: si o no.
-    - **Tipo de operación**: venta o alquiler.
+- "products_finder" (para buscar propiedades en venta y obtener información sobre ellas según la consulta del usuario):
+- query: string (consulta del usuario sobre la propiedad buscada).
+- Para armar la consulta, tené en cuenta lo siguiente:
+- número de habitaciones, ubicacion, metros cuadrados, piscina, precio aproximado
+- Esa información debes detectarla de la consulta del ususario
+- intenta que esté lo mas completa posible antes de armar la "query" de consulta.
+- Si el usuario no proporciona toda la información, hacé preguntas para obtenerla. Por ejemplo: "¿Cuántas habitaciones necesitas?" o "¿Cuál es tu presupuesto aproximado?".
 
-    - Asegurate de ir recopilando de a un valor por vez, y no todos juntos
-    - Si al usuario le da lo mismo una caracteristica, o no tiene preferencia, le das valor "sin asignar"
-    - Una vez que tengas todos los valores continúa-
+
 
 ### ℹ️ Información adicional
 
@@ -158,7 +156,7 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 - Todos los precios están en **euros**.
 
   
- `
+ `,
   );
 
   const response = await model.invoke([systemsMessage, ...messages]);
@@ -170,13 +168,10 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
   const tokens = encode(cadenaJSON);
   const numeroDeTokens = tokens.length;
   console.log("Tokens: ", numeroDeTokens);
-  
 
   // console.dir( state.messages[state.messages.length - 1], {depth: null});
 
   // console.log(`Número de tokens: ${numeroDeTokens}`);
-
-  // console.log("------------");
 
   return { messages: [...messages, response] };
 
@@ -199,8 +194,7 @@ function shouldContinue(state: typeof newState.State) {
   // Otherwise, we stop (reply to the user)
 }
 
-const humanNode = (lastMessage:any) => {
-  
+const humanNode = (lastMessage: any) => {
   const toolArgs = lastMessage.tool_calls[0].args as {
     habitaciones: string | null;
     precio_aproximado: string;
@@ -233,7 +227,7 @@ const humanNode = (lastMessage:any) => {
       piscina,
       superficie_total,
       tipo_operacion,
-    }
+    },
   )}`;
 
   const interruptConfig: HumanInterruptConfig = {
@@ -262,15 +256,12 @@ const humanNode = (lastMessage:any) => {
   } else if (humanResponse.type === "accept") {
     const message = `User accepted with: ${JSON.stringify(humanResponse.args)}`;
     return { interruptResponse: message, humanResponse: humanResponse };
-    
   } else if (humanResponse.type === "edit") {
     const message = `User edited with: ${JSON.stringify(humanResponse.args)}`;
     return { interruptResponse: message, humanResponse: humanResponse.args };
-
   } else if (humanResponse.type === "ignore") {
     const message = "User ignored interrupt.";
     return { interruptResponse: message, humanResponse: humanResponse };
-
   }
 
   return {
@@ -300,7 +291,9 @@ const toolNodo = async (state: typeof newState.State) => {
   let toolMessage: BaseMessageLike = "un tool message" as BaseMessageLike;
   if (lastMessage?.tool_calls?.length) {
     const toolName = lastMessage.tool_calls[0].name;
-    const toolArgs = lastMessage.tool_calls[0].args as pisosToolArgs & { query: string } & { startTime: string; endTime: string } & {
+    const toolArgs = lastMessage.tool_calls[0].args as pisosToolArgs & {
+      query: string;
+    } & { startTime: string; endTime: string } & {
       name: string;
       start: string;
       email: string;
@@ -309,28 +302,28 @@ const toolNodo = async (state: typeof newState.State) => {
 
     if (toolName === "Obtener_pisos_en_venta_dos") {
       const responseInterrupt = humanNode(lastMessage);
-      if(responseInterrupt.humanResponse && typeof responseInterrupt.humanResponse !== 'string' && responseInterrupt.humanResponse.args){
-        const toolArgsInterrupt = responseInterrupt.humanResponse.args as pisosToolArgs 
+      if (
+        responseInterrupt.humanResponse &&
+        typeof responseInterrupt.humanResponse !== "string" &&
+        responseInterrupt.humanResponse.args
+      ) {
+        const toolArgsInterrupt = responseInterrupt.humanResponse
+          .args as pisosToolArgs;
         const response = await getPisos2.invoke(toolArgsInterrupt);
         if (typeof response !== "string") {
           toolMessage = new ToolMessage(
             "Hubo un problema al consultar las propiedades intentemoslo nuevamente",
             tool_call_id,
-            "Obtener_pisos_en_venta_dos"
+            "Obtener_pisos_en_venta_dos",
           );
         } else {
           toolMessage = new ToolMessage(
             response,
             tool_call_id,
-            "Obtener_pisos_en_venta_dos"
+            "Obtener_pisos_en_venta_dos",
           );
         }
       }
-
-      
-      
-
-      
     } else if (toolName === "universal_info_2025") {
       const res = await pdfTool.invoke(toolArgs);
       toolMessage = new ToolMessage(res, tool_call_id, "universal_info_2025");
@@ -340,6 +333,12 @@ const toolNodo = async (state: typeof newState.State) => {
     } else if (toolName === "create_booking_tool") {
       const res = await createbookingTool.invoke(toolArgs);
       toolMessage = new ToolMessage(res, tool_call_id, "create_booking_tool");
+    } else if (toolName === "products_finder") {
+      const res = await productsFinder.invoke({
+        ...toolArgs,
+        props: INMUEBLE_PROPS,
+      } as any);
+      toolMessage = new ToolMessage(res, tool_call_id, "products_finder");
     }
   } else {
     return { messages };
@@ -392,7 +391,7 @@ const toolNodo = async (state: typeof newState.State) => {
 
 //   if (messages.length > 3) {
 //     if (!summary) {
-//       const intructions_summary = `Como asistente de inteligencia artificial, tu tarea es resumir los siguientes mensajes para mantener el contexto de la conversación. Por favor, analiza cada mensaje y elabora un resumen conciso que capture la esencia de la información proporcionada, asegurándote de preservar el flujo y coherencia del diálogo 
+//       const intructions_summary = `Como asistente de inteligencia artificial, tu tarea es resumir los siguientes mensajes para mantener el contexto de la conversación. Por favor, analiza cada mensaje y elabora un resumen conciso que capture la esencia de la información proporcionada, asegurándote de preservar el flujo y coherencia del diálogo
 //         mensajes: ${prompt_to_messages}
 //         `;
 
@@ -404,7 +403,7 @@ const toolNodo = async (state: typeof newState.State) => {
 //       mensajes: ${prompt_to_messages}
 
 //       resumen previo: ${summary}
-      
+
 //       `;
 
 //       const summary_message = await model.invoke(instructions_with_summary);
