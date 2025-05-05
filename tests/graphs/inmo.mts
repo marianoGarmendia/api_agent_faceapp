@@ -4,6 +4,8 @@ import {
   ToolMessage,
   type BaseMessageLike,
 } from "@langchain/core/messages";
+// import { v4 as uuidv4 } from "uuid";
+
 import {
   ActionRequest,
   HumanInterrupt,
@@ -12,6 +14,11 @@ import {
 } from "@langchain/langgraph/prebuilt";
 // import { tool } from "@langchain/core/tools";
 // import { z } from "zod";
+import  ComponentMap from "./agent/ui.js";
+import {
+  typedUi,
+  uiMessageReducer,
+} from "@langchain/langgraph-sdk/react-ui/server";
 import {
   Annotation,
   END,
@@ -20,10 +27,11 @@ import {
   StateGraph,
   interrupt,
 } from "@langchain/langgraph";
+import { LangGraphRunnableConfig } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
 import { TavilySearch } from "@langchain/tavily";
 // import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { encode } from "gpt-3-encoder";
+// import { encode } from "gpt-3-encoder";
 import { createbookingTool, getAvailabilityTool } from "./booking-cal.mjs";
 import { getPisos2, pdfTool } from "./pdf-loader_tool.mjs";
 // import { ensureToolCallsHaveResponses } from "./ensure-tool-response.mjs";
@@ -32,6 +40,8 @@ import { getPisos2, pdfTool } from "./pdf-loader_tool.mjs";
 import { contexts } from "./contexts.mjs";
 import { INMUEBLE_PROPS } from "./products_finder/schemas.mjs";
 import { productsFinder } from "./products_finder/tools.mjs";
+
+
 
 export const empresa = {
   eventTypeId: contexts.clinica.eventTypeId,
@@ -61,7 +71,9 @@ const stateAnnotation = MessagesAnnotation;
 const newState = Annotation.Root({
   ...stateAnnotation.spec,
   summary: Annotation<string>,
+  property: Annotation<object>,
   interruptResponse: Annotation<string>,
+  ui: Annotation({ reducer: uiMessageReducer, default: () => [] }),
 });
 
 // export const llmGroq = new ChatGroq({
@@ -82,8 +94,15 @@ export const model = new ChatOpenAI({
 
 // const toolNode = new ToolNode(tools);
 
-async function callModel(state: typeof newState.State) {
-  const { messages } = state;
+async function callModel(
+  state: typeof newState.State,
+  config: LangGraphRunnableConfig,
+) {
+  const { messages , property } = state;
+
+  const ui = typedUi(config);
+
+  
 
   // console.log("sumary agent en callModel");
   // console.log("-----------------------");
@@ -161,15 +180,20 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
 
   const response = await model.invoke([systemsMessage, ...messages]);
 
+
+ 
   // console.log("response: ", response);
 
-  const cadenaJSON = JSON.stringify(messages);
+  // const cadenaJSON = JSON.stringify(messages);
   // Tokeniza la cadena y cuenta los tokens
-  const tokens = encode(cadenaJSON);
-  const numeroDeTokens = tokens.length;
-  console.log("Tokens: ", numeroDeTokens);
+  // const tokens = encode(cadenaJSON);
+  // const numeroDeTokens = tokens.length;
 
-  // console.dir( state.messages[state.messages.length - 1], {depth: null});
+
+  console.log("ui:  " , state.ui);
+  console.log("repsonse ", response);
+  
+  
 
   // console.log(`Número de tokens: ${numeroDeTokens}`);
 
@@ -180,19 +204,112 @@ Tu estilo es cálido, profesional y sobre todo **persuasivo pero no invasivo**. 
   // We return a list, because this will get added to the existing list
 }
 
-function shouldContinue(state: typeof newState.State) {
-  const { messages } = state;
+// Asi debe verse el ui items
+// ui items: [
+//   {
+//     type: 'ui',
+//     id: '078dd3e2-55d8-4c6b-a816-f215ca86e438',
+//     name: 'accommodations-list',
+//     props: {
+//       toolCallId: 'call_HKFTSQQKIWPAJI8JUn5SJei9',
+//       tripDetails: [Object],
+//       accommodations: [Array]
+//     },
+//     metadata: {
+//       merge: undefined,
+//       run_id: '1ed83f9a-d953-4527-9e5b-1474fca72355',
+//       tags: [],
+//       name: undefined,
+//       message_id: 'chatcmpl-BTb6SQ2iOOpI0WoEfdke1uDgAydt6'
+//     }
+//   },
+
+function shouldContinue(state: typeof newState.State, config: LangGraphRunnableConfig) {
+  const { messages  } = state;
+ 
 
   const lastMessage = messages[messages.length - 1] as AIMessage;
   // If the LLM makes a tool call, then we route to the "tools" node
   if (lastMessage?.tool_calls?.length) {
     return "tools";
   } else {
+ 
+    
+
+    console.log("end of conversation");
+
     return END;
   }
 
   // Otherwise, we stop (reply to the user)
 }
+
+const products = [
+  {
+    agente: "M&M .",
+    alrededores: "Bus:\nTren:\nRestaurantes:\nAeropuerto:",
+    banios: 1,
+    caracteristicas: [
+      "Planta 1",
+      "Aparcamiento",
+      "Terraza",
+      "Buen Estado",
+      "Comunidad:  0",
+      "Ventanas: Aluminio",
+      "Cocina: Independiente",
+      "Ubicación: Céntrico",
+    ],
+    circunstancia: "No Disponible",
+    ciudad: "Gava",
+    cocina: "Independiente",
+    codigo_postal: 8850,
+    construccion_nueva: 0,
+    consumo_energia: 0,
+    direccion: "Calle Sarria, 11, puerta 2",
+    dormitorios: 3,
+    emisiones: 0,
+    estado: "No Disponible",
+    estgen: "Buen Estado",
+    fecha_alta: "2024-04-26 00:00:00",
+    freq_precio: "sale",
+    "geolocalizacion.latitude": 41.30558,
+    "geolocalizacion.longitude": 2.00845,
+    id: "1985",
+    image_url:
+      "https://crm904.inmopc.com/INMOWEB-PHP/base/fotos/inmuebles/98475/9847513104_5.jpg",
+    m2constr: 0,
+    m2terraza: 0,
+    m2utiles: 82,
+    moneda: "EUR",
+    nascensor: 0,
+    ntrasteros: 0,
+    num_inmueble: 11,
+    num_pisos_bloque: 0,
+    num_pisos_edificio: 0,
+    num_planta: "1ª Planta",
+    num_terrazas: 1,
+    pais: "spain",
+    piscina: 1,
+    precio: 208000,
+    "propietario.apellido": "David",
+    "propietario.codigo": 51,
+    "propietario.comercial": "M&M .",
+    "propietario.fecha_alta": "03/11/2023",
+    "propietario.nombre": "Maria",
+    provincia: "Barcelona",
+    puerta: 2,
+    ref: 3092,
+    "superficie.built": 0,
+    "superficie.plot": 0,
+    tipo: "piso",
+    tipo_operacion: "Venta",
+    tipo_via: "Calle",
+    ubicacion: "Céntrico",
+    ventana: "Aluminio",
+    zona: "Centre",
+    url: "https://propiedades.winwintechbank.com/#/producto/1985",
+  },
+];
 
 const humanNode = (lastMessage: any) => {
   const toolArgs = lastMessage.tool_calls[0].args as {
@@ -279,9 +396,9 @@ interface pisosToolArgs {
   tipo_operacion: "venta" | "alquiler";
 }
 
-const toolNodo = async (state: typeof newState.State) => {
+const toolNodo = async (state: typeof newState.State, config:LangGraphRunnableConfig) => {
   const { messages } = state;
-
+  const ui = typedUi(config);
   const lastMessage = messages[messages.length - 1] as AIMessage;
   console.log("toolNodo");
   console.log("-----------------------");
@@ -290,6 +407,7 @@ const toolNodo = async (state: typeof newState.State) => {
 
   let toolMessage: BaseMessageLike = "un tool message" as BaseMessageLike;
   if (lastMessage?.tool_calls?.length) {
+    const lastMessageID = lastMessage.id
     const toolName = lastMessage.tool_calls[0].name;
     const toolArgs = lastMessage.tool_calls[0].args as pisosToolArgs & {
       query: string;
@@ -338,7 +456,17 @@ const toolNodo = async (state: typeof newState.State) => {
         ...toolArgs,
         props: INMUEBLE_PROPS,
       } as any);
-      toolMessage = new ToolMessage(res, tool_call_id, "products_finder");
+      toolMessage = res.message as ToolMessage;
+      ui.push({
+        name: "products-carousel",
+        props:{
+          items: res.item,
+          toolCallId: tool_call_id,
+        },
+        metadata:{
+          message_id:lastMessageID
+        }
+      })
     }
   } else {
     return { messages };
@@ -350,7 +478,7 @@ const toolNodo = async (state: typeof newState.State) => {
   // });
   // console.log("toolMessage: ", toolMessage);
 
-  return { messages: [...messages, toolMessage] };
+  return {ui:ui.items,  messages: [...messages, toolMessage] };
 };
 
 // const delete_messages = async (state: typeof newState.State) => {

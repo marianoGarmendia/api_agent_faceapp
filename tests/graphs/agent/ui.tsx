@@ -1,7 +1,12 @@
-const WeatherComponent = (props: { city: string }) => {
-  return <div>Weather for {props.city}</div>;
-};
 
-export default {
-  "weather-component": WeatherComponent,
-};
+import PropertyCard from "./PropertyCard.js";
+import ProductsCarousel from "./ProductCarousel.js";
+
+const ComponentMap = {
+  "property-card": PropertyCard,
+  "products-carousel": ProductsCarousel,
+  
+} as const;
+
+export default ComponentMap;
+

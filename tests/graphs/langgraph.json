@@ -12,7 +12,7 @@
     "naturgy": "./naturgy.mts:workflow"
   },
   "ui": {
-    "agent": "./agent/ui.tsx"
+    "inmo_agent": "./agent/ui.tsx"
   },
   "http": {
     "app": "./http.mts:app"

@@ -1,0 +1,198 @@
+import  { useRef , useEffect , useState} from 'react';
+import {Product} from './PropertyCard.js'
+import PropertyCard from './PropertyCard.js';
+// import {
+//     Carousel,
+//     CarouselContent,
+//     CarouselItem,
+//     CarouselNext,
+//     CarouselPrevious,
+//   } from "../../../src/ui/Carousel.js";
+import "./styles.css";
+
+interface CarouselProps {
+        items: Product[];
+      }
+
+/// Hook para media query
+// function useMediaQuery(query: string): boolean {
+//     const [matches, setMatches] = useState(false);
+//     useEffect(() => {
+//       const mql = window.matchMedia(query);
+//       const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
+//       setMatches(mql.matches);
+//       mql.addEventListener('change', listener);
+//       return () => mql.removeEventListener('change', listener);
+//     }, [query]);
+//     return matches;
+//   }
+  
+//   interface CarouselProps {
+//     items: Product[];
+//   }
+  
+//   const ProductsCarousel: React.FC<CarouselProps> = (props:CarouselProps) => {
+//     const isDesktop = useMediaQuery('(min-width: 768px)'); // md breakpoint
+//     const itemsPerPage = isDesktop ? 3 : 1;
+//     const pageCount = Math.ceil(props.items.length / itemsPerPage);
+  
+//     const [current, setCurrent] = useState(0);
+//     const containerRef = useRef<HTMLDivElement>(null);
+  
+//     // Ajusta current si cambia itemsPerPage o cantidad
+//     useEffect(() => {
+//       if (current >= pageCount) {
+//         setCurrent(pageCount - 1);
+//       }
+//     }, [pageCount, current]);
+  
+//     // Al cambiar current, desplazamos el contenedor
+//     useEffect(() => {
+//       if (containerRef.current) {
+//         const offset = containerRef.current.clientWidth * current;
+//         containerRef.current.style.transform = `translateX(-${offset}px)`;
+//       }
+//     }, [current]);
+  
+//     const handlePrev = () => setCurrent((idx) => Math.max(idx - 1, 0));
+//     const handleNext = () => setCurrent((idx) => Math.min(idx + 1, pageCount - 1));
+  
+//     return (
+//       <div className="max-w-full overflow-hidden relative">
+//         {/* Contenedor slider */}
+//         <div
+//           ref={containerRef}
+//           className="flex transition-transform duration-300 ease-in-out"
+//           style={{ width: `${(props.items.length / itemsPerPage) * 100}%` }}
+//         >
+//           {props.items.map((product, idx) => (
+//             <div
+//               key={idx}
+//               className={` p-2`}            
+//               style={{ width: `${100 / props.items.length}%` }}
+//             >
+//               <PropertyCard {...product} />
+//             </div>
+//           ))}
+//         </div>
+  
+//         {/* Flechas */}
+//         <button
+//           onClick={handlePrev}
+//           disabled={current === 0}
+//           className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-100 z-10"
+//         >
+//           ‹
+//         </button>
+//         <button
+//           onClick={handleNext}
+//           disabled={current === pageCount - 1}
+//           className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-100 z-10"
+//         >
+//           ›
+//         </button>
+  
+//         {/* Paginación: puntos */}
+//         <div className="flex justify-center space-x-2 mt-4">
+//           {Array.from({ length: pageCount }).map((_, idx) => (
+//             <button
+//               key={idx}
+//               onClick={() => setCurrent(idx)}
+//               className={
+//                 `w-2 h-2 rounded-full transition-colors ` +
+//                 (idx === current ? 'bg-gray-800' : 'bg-gray-300')
+//               }
+//               aria-label={
+//                 idx === current
+//                   ? `Página ${idx + 1}, actual`
+//                   : `Ir a página ${idx + 1}`
+//               }
+//             />
+//           ))}
+//         </div>
+//       </div>
+//     );
+//   };
+
+function ProductsCarousel(props:CarouselProps) {
+    const [current, setCurrent] = useState(0);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // Ajusta la cantidad de items por página según el ancho
+  const [itemsPerPage, setItemsPerPage] = useState(1);
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      const w = window.innerWidth;
+      if (w >= 1024) setItemsPerPage(3);
+      else if (w >= 768) setItemsPerPage(2);
+      else setItemsPerPage(1);
+    };
+    updateItemsPerPage();
+    window.addEventListener('resize', updateItemsPerPage);
+    return () => window.removeEventListener('resize', updateItemsPerPage);
+  }, []);
+
+  const pageCount = Math.ceil(props.items.length / itemsPerPage);
+
+  // Desplaza el track
+  useEffect(() => {
+    if (wrapperRef.current && trackRef.current) {
+      const wrapperWidth = wrapperRef.current.clientWidth;
+      trackRef.current.style.transform = `translateX(-${current * wrapperWidth}px)`;
+    }
+  }, [current, props.items.length, itemsPerPage]);
+
+  const prev = () => setCurrent((c) => Math.max(c - 1, 0));
+  const next = () => setCurrent((c) => Math.min(c + 1, pageCount - 1));
+
+  return (
+    <div className="relative  overflow-hidden" ref={wrapperRef}>
+      <div
+        ref={trackRef}
+        className="flex transition-transform duration-300 ease-in-out"
+        style={{ width: `${(props.items.length / itemsPerPage) * 100}%` }}
+      >
+        {props.items.map((product, idx) => (
+          <div
+            key={idx}
+            className="flex-shrink-0"
+            style={{ width: `${100 / props.items.length}%`, padding: '0 8px' }}
+          >
+            <PropertyCard {...product} />
+          </div>
+        ))}
+      </div>
+
+      {/* Botones */}
+      <button
+        onClick={prev}
+        disabled={current === 0}
+        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow disabled:opacity-50"
+      >
+        ‹
+      </button>
+      <button
+        onClick={next}
+        disabled={current === pageCount - 1}
+        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow disabled:opacity-50"
+      >
+        ›
+      </button>
+
+      {/* Dots */}
+      <div className="flex justify-center mt-4 space-x-2">
+        {Array.from({ length: pageCount }).map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrent(idx)}
+            className={`h-2 w-2 rounded-full transition-colors ${
+              idx === current ? 'bg-gray-800' : 'bg-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );}
+  export default ProductsCarousel;
+  

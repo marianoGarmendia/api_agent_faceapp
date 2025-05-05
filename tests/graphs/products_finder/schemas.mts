@@ -42,7 +42,7 @@ export const buildQuerySchema = (props: string[]) =>
 export const buildQueryFilterModel = (querySchema: ZodSchema) => 
     chatModel.withStructuredOutput(querySchema, {
     strict: false,
-  });
+  }).withConfig({ tags: ["nostream"] });
 
   
 
