@@ -1,18 +1,20 @@
-import  { useRef , useEffect , useState} from 'react';
+// import  { useRef , useEffect , useState} from 'react';
 import {Product} from './PropertyCard.js'
 import PropertyCard from './PropertyCard.js';
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-  } from "../../../src/ui/Carousel.js";
 import "./styles.css";
 
-interface CarouselProps {
-        items: Product[];
-      }
+// import {
+//     Carousel,
+//     CarouselContent,
+//     CarouselItem,
+//     CarouselNext,
+//     CarouselPrevious,
+//   } from "../../../src/ui/Carousel.js";
+// import "./styles.css";
+
+// interface CarouselProps {
+//         items: Product[];
+//       }
 
 /// Hook para media query
 // function useMediaQuery(query: string): boolean {
@@ -114,33 +116,43 @@ interface CarouselProps {
 //     );
 //   };
 
-function ProductsCarousel(props:CarouselProps) {
-  
+import React from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Pagination } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/pagination'
 
+
+interface Props {
+  items: Product[]
+}
+
+const PropertyCarousel: React.FC<Props> = (props:Props) => {
   return (
-    <div className="space-y-8">
-    <Carousel
-      opts={{
-        align: "start",
-        loop: true,
-      }}
-      className="w-full sm:max-w-sm md:max-w-3xl lg:max-w-3xl"
-    >
-      <CarouselContent>
-        {props.items.map((prop) => (
-          <CarouselItem
-            key={prop.id}
-            className="basis-1/2 md:basis-1/4"
-            onClick={() => {}}
-          >
-            <PropertyCard {...prop} />
-          </CarouselItem>
+    <div className="w-full max-[50%] overflow-x-hidden">
+      <Swiper
+      
+        modules={[Pagination]}
+        spaceBetween={8}
+        slidesPerView={1}
+        pagination={{ clickable: true }}
+        breakpoints={{
+          // a partir de 640px de ancho muestra 2 slides
+          640: { slidesPerView: 2 },
+          // a partir de 1024px muestra 3 slides
+          1024: { slidesPerView: 3 },
+        }}
+        className="py-4"
+        
+      >
+        {props.items.map((p) => (
+          <SwiperSlide key={p.id}>
+            <PropertyCard {...p} />
+          </SwiperSlide>
         ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
-  </div>
-  );}
-  export default ProductsCarousel;
-  
+      </Swiper>
+    </div>
+  )
+}
+
+export default PropertyCarousel
