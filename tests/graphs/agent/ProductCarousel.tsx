@@ -1,13 +1,13 @@
 import  { useRef , useEffect , useState} from 'react';
 import {Product} from './PropertyCard.js'
 import PropertyCard from './PropertyCard.js';
-// import {
-//     Carousel,
-//     CarouselContent,
-//     CarouselItem,
-//     CarouselNext,
-//     CarouselPrevious,
-//   } from "../../../src/ui/Carousel.js";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+  } from "../../../src/ui/Carousel.js";
 import "./styles.css";
 
 interface CarouselProps {
@@ -115,84 +115,32 @@ interface CarouselProps {
 //   };
 
 function ProductsCarousel(props:CarouselProps) {
-    const [current, setCurrent] = useState(0);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  // Ajusta la cantidad de items por página según el ancho
-  const [itemsPerPage, setItemsPerPage] = useState(1);
-  useEffect(() => {
-    const updateItemsPerPage = () => {
-      const w = window.innerWidth;
-      if (w >= 1024) setItemsPerPage(3);
-      else if (w >= 768) setItemsPerPage(2);
-      else setItemsPerPage(1);
-    };
-    updateItemsPerPage();
-    window.addEventListener('resize', updateItemsPerPage);
-    return () => window.removeEventListener('resize', updateItemsPerPage);
-  }, []);
-
-  const pageCount = Math.ceil(props.items.length / itemsPerPage);
-
-  // Desplaza el track
-  useEffect(() => {
-    if (wrapperRef.current && trackRef.current) {
-      const wrapperWidth = wrapperRef.current.clientWidth;
-      trackRef.current.style.transform = `translateX(-${current * wrapperWidth}px)`;
-    }
-  }, [current, props.items.length, itemsPerPage]);
-
-  const prev = () => setCurrent((c) => Math.max(c - 1, 0));
-  const next = () => setCurrent((c) => Math.min(c + 1, pageCount - 1));
+  
 
   return (
-    <div className="relative  overflow-hidden" ref={wrapperRef}>
-      <div
-        ref={trackRef}
-        className="flex transition-transform duration-300 ease-in-out"
-        style={{ width: `${(props.items.length / itemsPerPage) * 100}%` }}
-      >
-        {props.items.map((product, idx) => (
-          <div
-            key={idx}
-            className="flex-shrink-0"
-            style={{ width: `${100 / props.items.length}%`, padding: '0 8px' }}
+    <div className="space-y-8">
+    <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      className="w-full sm:max-w-sm md:max-w-3xl lg:max-w-3xl"
+    >
+      <CarouselContent>
+        {props.items.map((prop) => (
+          <CarouselItem
+            key={prop.id}
+            className="basis-1/2 md:basis-1/4"
+            onClick={() => {}}
           >
-            <PropertyCard {...product} />
-          </div>
+            <PropertyCard {...prop} />
+          </CarouselItem>
         ))}
-      </div>
-
-      {/* Botones */}
-      <button
-        onClick={prev}
-        disabled={current === 0}
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow disabled:opacity-50"
-      >
-        ‹
-      </button>
-      <button
-        onClick={next}
-        disabled={current === pageCount - 1}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow disabled:opacity-50"
-      >
-        ›
-      </button>
-
-      {/* Dots */}
-      <div className="flex justify-center mt-4 space-x-2">
-        {Array.from({ length: pageCount }).map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrent(idx)}
-            className={`h-2 w-2 rounded-full transition-colors ${
-              idx === current ? 'bg-gray-800' : 'bg-gray-300'
-            }`}
-          />
-        ))}
-      </div>
-    </div>
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+  </div>
   );}
   export default ProductsCarousel;
   
