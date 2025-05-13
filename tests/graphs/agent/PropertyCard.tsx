@@ -1,15 +1,9 @@
-// import {
-//   Carousel,
-//   CarouselContent,
-//   CarouselItem,
-//   CarouselNext,
-//   CarouselPrevious,
-// } from "../../../src/ui/Carousel.js";
+
 import "./styles.css";
 
 const PropertyCard: React.FC<Product> = (props:Product) => {
   return (
-    <div className="w-[max-content] px-6 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 mx-2">
+    <div className="max-w-[80%] px-6  bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 mx-2">
     <img
         src={"https://media.ambito.com/p/0d7dcb42b3f914aa1a1dced3b943dfdc/adjuntos/239/imagenes/041/278/0041278247/inmobiliariajpg.jpg"}
         alt={props.direccion}

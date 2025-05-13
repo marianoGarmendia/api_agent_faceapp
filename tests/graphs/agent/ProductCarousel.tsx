@@ -117,8 +117,7 @@ import "./styles.css";
 //   };
 
 import React from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Pagination } from 'swiper/modules'
+
 import 'swiper/css'
 import 'swiper/css/pagination'
 
@@ -129,30 +128,13 @@ interface Props {
 
 const PropertyCarousel: React.FC<Props> = (props:Props) => {
   return (
-    <div className="w-full max-[50%] overflow-x-hidden">
-      <Swiper
-      
-        modules={[Pagination]}
-        spaceBetween={8}
-        slidesPerView={1}
-        pagination={{ clickable: true }}
-        breakpoints={{
-          // a partir de 640px de ancho muestra 2 slides
-          640: { slidesPerView: 2 },
-          // a partir de 1024px muestra 3 slides
-          1024: { slidesPerView: 3 },
-        }}
-        className="py-4"
-        
-      >
-        {props.items.map((p) => (
-          <SwiperSlide key={p.id}>
-            <PropertyCard {...p} />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+    <div className="relative max-w-[90%] flex flex-col gap-4 px-4 my-4">
+      {props.items.map((p) => (
+        <PropertyCard key={p.id} {...p} />
+      ))}
     </div>
   )
+
 }
 
 export default PropertyCarousel
