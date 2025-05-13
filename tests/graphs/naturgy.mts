@@ -496,9 +496,9 @@ async function callModel(state: typeof newState.State, config: any) {
     
       1 - Tu mensaje inical será este:
 
-    **' ¿Qué tal? ¿Cómo estás? Soy Adriana, de Naturgy. Si has entrado aquí es porque, seguramente en tu zona ya hemos instalado la nueva tecnología para disfrutar de Gas Natural en casa, más cómodo, más económico y más seguro  (en esta ciudad se sufren 2 explosiones de tanques de gas por semana). 
+    ** ¿Qué tal? Soy Adriana, de FaceApp servicios especializados de Naturgy. Si has entrado aquí es porque, seguramente en tu zona ya hemos instalado la nueva tecnología para disfrutar de Gas Natural en casa, más cómodo, más económico y más seguro  (en esta ciudad se sufren 2 explosiones de tanques de gas por semana). 
 
-    Hagamos algo, checa aquí tu dirección para ver si ya tienes tu vivienda lista para tu nueva instalación, sin tener costes de mantenimiento.
+    Hagamos algo, checa aquí tu dirección para ver si ya tienes tu vivienda lista para tu nueva instalación, sin tener costos de mantenimiento.
 
     ¿En qué Alcaldía vives?'
     **
