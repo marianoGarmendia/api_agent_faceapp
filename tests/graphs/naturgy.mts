@@ -4,16 +4,11 @@ import {
   ToolMessage,
 } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
-import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
+import { z } from "zod";
 // import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 
-import { StateGraph, Command, END } from "@langchain/langgraph";
-import {
-  MemorySaver,
-  Annotation,
-  MessagesAnnotation,
-} from "@langchain/langgraph";
+import { Annotation, Command, END, MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 // import {
 //   pdfTool,
@@ -504,8 +499,8 @@ async function callModel(state: typeof newState.State, config: any) {
     **
 
     2 - Luego de que el usuario te brinde la alcaldía, le preguntas por la colonia y luego por la calle y el número de condominio. cada pregunta por separado continuas hasta obtener los datos para consultar el seduvi con la herramienta 'obtener_seduvi'.
-    3 - Una vez que obtengas la información del seduvi, le preguntas el nombre y si utiliza tanque estacionario , (es el gas LP , lo tanques de gas envasado).
-    4 - Una vez conusltado el seduvi y el nombre del usuario, le pides el piso , el departamento y el telefono, de a uno por vez. (recuerda que ya tienes la calle y el número de casa cuando consultaste el seduvi, por lo que no es necesario volver a preguntar por esos datos).
+    3 - Una vez que obtengas la información del seduvi, le preguntas el nombre y si utiliza cilindros o tanque estacionario.
+    4 - Una vez consultado el seduvi y el nombre del usuario, le pides el piso , el departamento y el telefono, de a uno por vez. (recuerda que ya tienes la calle y el número de casa cuando consultaste el seduvi, por lo que no es necesario volver a preguntar por esos datos).
     5 - Cuando te da el domicilio y número de puerta realizas la siguiente acción:
     - Le dices que vas a consultar si su domicilio es apto para tener acceso al gas naturtal, que espere un momento...
     6 - Le dices: 'enhorabuena porque hemos comprobado que su domicilio es apto para tener Gas Natural'.
@@ -535,22 +530,22 @@ async function callModel(state: typeof newState.State, config: any) {
     - Tanque de 45 kg:
         - Gas L.P: $885
         - Gas Natural: $562.05
-
+        - Ahorro: $323 (36.5%)
 
     
     ### ORDEN DE PREGUNTAS CUANDO SOLICITA INFORMACIÓN SOBRE AHORROS Y COMPARATIVAS DE PRECIOS:
     
-    1. Pregunta de cuánto es el tanque que utiliza, el de 20 kg, 30 kg o 45 kg.
+    Solo si respondió que usa cilindros de gas:
+    1. Pregunta de cuánto es el cilindro que utiliza, de 20 kg, 30 kg o 45 kg.
     2. Procede a realizar la comparativa de precios y ahorros con el gas natural, destaca los porcentajes de ahorros.
     
-    Resalta que:
+    En cualquier caso, resalta que:
         
     - El gas natural es más económico y más cómodo, ya que no requiere recargas ni transporte de tanques.
     - El suministro es continuo, seguro y monitoreado 24/7.
     - Además de ahorrar dinero, el cliente contribuye con el medio ambiente, ya que el gas natural es una opción más limpia y eficiente.
     
     Responde siempre de manera clara, amigable y orientada al beneficio del usuario.
-    
     
     
     ### INFORMACIÓN SOBRE HERRAMIENTAS DISPONIBLES:
@@ -590,7 +585,7 @@ async function callModel(state: typeof newState.State, config: any) {
     - Si no quiere dar el teléfono le dices que no hay problema, pero que es importante para el contacto de la person que va a visitarlo/a.
     - Le dices que vas a consultar disponibilidad y que espere un momento
     - (simulas una busqueda de disponibilidad y le dices que ya tienes la información)
-    - Le dices que su domicilio es apto para recibir el servicio de gas natural y le preguntas si quiere coordinar una visita para la solicitud del servicio.
+    - Le preguntas si quiere coordinar una visita para la solicitud del servicio.
     - Si responde de manera afirmativa, recopilas la siguiente información de a uno por vez:
         
     - horario 
