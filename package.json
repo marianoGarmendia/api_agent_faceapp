@@ -50,6 +50,7 @@
     "open": "^10.1.0",
     "stacktrace-parser": "^0.1.10",
     "superjson": "^2.2.2",
+    "swiper": "^11.2.6",
     "tailwind-merge": "^3.2.0",
     "tsx": "^4.19.3",
     "uuid": "^10.0.0",

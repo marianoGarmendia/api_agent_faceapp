@@ -7,33 +7,43 @@
 // } from "../../../src/ui/Carousel.js";
 import "./styles.css";
 
-export default function PropertyCard (props: Product)  {
+const PropertyCard: React.FC<Product> = (props:Product) => {
   return (
-    <div className="max-w-sm bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-      <img
-        src={props.image_url}
-        alt={props.image_url}
-        className=" h-full object-cover"
+    <div className="w-[max-content] px-6 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 mx-2">
+    <img
+        src={"https://media.ambito.com/p/0d7dcb42b3f914aa1a1dced3b943dfdc/adjuntos/239/imagenes/041/278/0041278247/inmobiliariajpg.jpg"}
+        alt={props.direccion}
+        className="h-48 w-full object-cover"
       />
-      <div className="p-6">
-        <h2 className="text-xl font-semibold mb-2">Caracteristicas</h2>
-        <p className="text-gray-600 mb-4">
-          {/* {props.caracteristicas.map((caracteristica, index) => (
-            <span key={index} className="block">{caracteristica}</span>
-          ))} */}
-          {props.caracteristicas.join(", ")}
+      <div className="p-4">
+        <h3 className="text-lg font-semibold mb-1 line-clamp-1">
+          {props.ciudad}, {props.zona}
+        </h3>
+        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+          {props.direccion}
         </p>
-        <div className="text-green-600 font-bold text-lg">
+        <div className="text-green-600 font-bold text-lg mb-2">
           {props.moneda}{props.precio}
         </div>
-        <div className="text-green-600 font-bold text-lg">
-            <a target="_blank" href={props.url}>Ver Publicación</a>
+        <div>
+          Baños: {props.banios} | Dormitorios: {props.dormitorios} |{" "}
+          Superficie: {props.m2utiles} m² | {props.tipo}
+          piscina: {props.piscina ? "Sí" : "No"}
         </div>
+        <a
+          href={props.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:underline text-sm"
+        >
+          Ver publicación
+        </a>
       </div>
     </div>
-  );
-};
+  )
+}
 
+export default PropertyCard
 
 export interface Product {
   agente: string;
