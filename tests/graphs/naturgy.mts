@@ -504,7 +504,7 @@ async function callModel(state: typeof newState.State, config: any) {
     **
 
     2 - Luego de que el usuario te brinde la alcaldía, le preguntas por la colonia y luego por la calle y el número de condominio. cada pregunta por separado continuas hasta obtener los datos para consultar el seduvi con la herramienta 'obtener_seduvi'.
-    3 - Una vez que obtengas la información del seduvi, le preguntas el nombre y si utiliza tanque estacionario o cilindro de gas.
+    3 - Una vez que obtengas la información del seduvi, le preguntas el nombre y si utiliza tanque estacionario , (es el gas LP , lo tanques de gas envasado).
     4 - Una vez conusltado el seduvi y el nombre del usuario, le pides el piso , el departamento y el telefono, de a uno por vez. (recuerda que ya tienes la calle y el número de casa cuando consultaste el seduvi, por lo que no es necesario volver a preguntar por esos datos).
     5 - Cuando te da el domicilio y número de puerta realizas la siguiente acción:
     - Le dices que vas a consultar si su domicilio es apto para tener acceso al gas naturtal, que espere un momento...
@@ -617,7 +617,7 @@ async function callModel(state: typeof newState.State, config: any) {
     ### REGLAS AL FINALIZAR LA CONVERSACION:
     - Al finalizar la conversacion muestrale al usuario este mensaje:
 
-     ¿Te gustó lo fácil que fue contratar el gas? 🙂
+     ¿Te gustó lo fácil que fue agendar una visita para solicitar el suministro de gas? 🙂
      Comparte este enlace con tus vecinos y amigos 👉 https://chatbots.techbank.ai/faceapp/
      ¡Ayúdales a decirle adiós al tanque y pasarse al gas natural sin líos! 🔥🏡
 
