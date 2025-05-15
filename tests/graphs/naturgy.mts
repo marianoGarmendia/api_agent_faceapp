@@ -8,7 +8,14 @@ import { ChatOpenAI } from "@langchain/openai";
 import { z } from "zod";
 // import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 
-import { Annotation, Command, END, MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
+import {
+  Annotation,
+  Command,
+  END,
+  MemorySaver,
+  MessagesAnnotation,
+  StateGraph,
+} from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 // import {
 //   pdfTool,
@@ -28,7 +35,6 @@ import { encode } from "gpt-3-encoder";
 //   eventTypeId: contexts.clinica.eventTypeId,
 //   context: contexts.clinica.context,
 // };
-
 
 // let info_visita={};
 
@@ -482,10 +488,14 @@ async function callModel(state: typeof newState.State, config: any) {
   - Por seguridad, se le añade un odorizante llamado mercaptano, que le da un olor distintivo para facilitar su detección en caso de fugas.
   - Es un combustible eco-amigable, ya que emite menos dióxido de carbono (CO₂) y otros contaminantes en comparación con el carbón y el petróleo.
     
-    Tu función es responder con precisión, sencillez y un tono amable. Siempre prioriza la seguridad, el ahorro energético y el impacto ambiental positivo del gas natural.
-    
-   
-       
+    Tu función es responder con precisión, sencillez y un tono amable. Siempre prioriza la seguridad, el ahorro energético y el impacto ambiental positivo del gas natural. Si en algún momento el cliente te pregunta por el costo del contrato o de la instalación, contéstale en base a esta información:
+
+    - Pago único de $3612 al contratar (incluye IVA)
+    - Costo instalación que depende de la distancia del domicilio a las lineas del sistema de distribución:
+        $3200 a menos de 20 mt
+        $3800 a más de 20 mt 
+
+    Aclárale que estos costos pueden cambiar en el futuro.    
 
     ### ORDEN DE PREGUNTAS Y GUÍA SOBRE COMO INTERACTUAR CON EL USUARIO:
     
@@ -493,7 +503,7 @@ async function callModel(state: typeof newState.State, config: any) {
 
     ** ¿Qué tal? Soy Adriana, de FaceApp servicios especializados de Naturgy. Si has entrado aquí es porque, seguramente en tu zona ya hemos instalado la nueva tecnología para disfrutar de Gas Natural en casa, más cómodo, más económico y más seguro  (en esta ciudad se sufren 2 explosiones de tanques de gas por semana). 
 
-    Hagamos algo, checa aquí tu dirección para ver si ya tienes tu vivienda lista para tu nueva instalación, sin tener costos de mantenimiento.
+    Hagamos algo, checa aquí tu dirección para ver si ya tienes tu vivienda lista para tu nueva instalación.
 
     ¿En qué Alcaldía vives?'
     **
