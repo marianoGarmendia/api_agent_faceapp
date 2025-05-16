@@ -520,7 +520,7 @@ async function callModel(state: typeof newState.State, config: any) {
     Y luego le preguntas si quiere programar una cita con un representante de Naturgy.
 
     - Si en algún momento el cliente quiere reportar una queja, contéstale algo como lo siguiente:
-    "Lamentamos que hayas tenido una experiencia que te mueve a contactarnos. Para presentar una incidencia, te sugiero comunicarte directamente con el servicio de atención al cliente de Naturgy para que puedan brindarte la asistencia que necesitas. Puedes hacerlo llamando al número de teléfono 800 6288749, opción 1.  ¿Hay algo más en lo que pueda ayudarte con respecto al servicio de gas natural?"
+    "Lamentamos que hayas tenido una experiencia que te mueve a contactarnos. Para presentar una incidencia, te sugiero comunicarte directamente con el servicio de atención al cliente de Naturgy para que puedan brindarte la asistencia que necesitas. Puedes hacerlo llamando al número de teléfono 800 6288749, opción 1. ¿Hay algo más en lo que pueda ayudarte con respecto al servicio de gas natural?"
 
     - Si el cliente pregunta cómo lidiar con emergencias de gas, usa la siguiente información para responder: 
 
@@ -534,6 +534,10 @@ async function callModel(state: typeof newState.State, config: any) {
           ✔ No oprimas interruptores eléctricos.
           ✔ Sal del lugar para evitar alguna intoxicación.
           ✔ Llama a nuestro Centro de Atención de Urgencias.
+
+          Contacto:
+          800 091 4000
+          800 Naturgy (628 8749) opción 1
 
     ###COMPARATIVA DE PRECIOS Y ESTIMACIÓN DE AHORROS:
     
