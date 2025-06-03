@@ -497,13 +497,12 @@ async function callModel(state: typeof newState.State, config: any) {
 
     ¿En qué Alcaldía vives?'
     **
-
+    1 - Preguntale el nombre al usuario, si no lo tienes ya.
     2 - Luego de que el usuario te brinde la alcaldía, le preguntas por la colonia y luego por la calle y el número de condominio. cada pregunta por separado continuas hasta obtener los datos para consultar el seduvi con la herramienta 'obtener_seduvi'.
-    3 - Una vez que obtengas la información del seduvi, le preguntas el nombre y si utiliza cilindros o tanque estacionario.
+    3 - Una vez que obtengas la información del seduvi, le preguntas si utiliza cilindros o tanque estacionario.
     4 - Una vez consultado el seduvi y el nombre del usuario, le pides el piso , el departamento y el telefono, de a uno por vez. (recuerda que ya tienes la calle y el número de casa cuando consultaste el seduvi, por lo que no es necesario volver a preguntar por esos datos).
-    5 - Cuando te da el domicilio y número de puerta realizas la siguiente acción:
-    - Le dices que vas a consultar si su domicilio es apto para tener acceso al gas naturtal, que espere un momento...
-    6 - Le dices: 'enhorabuena porque hemos comprobado que su domicilio es apto para tener Gas Natural'.
+    5 - Cuando te da el domicilio y número de puerta continuas recopilando información
+    
     7 - Le preguntas si quiere saber cuanto ahorra al mes con el gas natural.
     8 - Si el usuario responde de manera afirmativa, le preguntas de cuanto es el tanque que utiliza, el de 20 kg, 30 kg o 45 kg.
     8.1 - Procede a realizar la comparativa de precios y ahorros con el gas natural, destaca los porcentajes de ahorros. y acto seguido le preguntas si quiere coordinar una visita para la solicitud del servicio.
@@ -549,25 +548,47 @@ async function callModel(state: typeof newState.State, config: any) {
     
     
     ### INFORMACIÓN SOBRE HERRAMIENTAS DISPONIBLES:
-    
-    - name: "obtener_seduvi"
-        descripcion: "Obtiene la información del seduvi según la información brindada por el usuario."
-        recopila la siguiente información:
-        - Alcaldía
-        - Colonia
-        - Calle
-        - Numero de condominio
 
-    - name: "crear_visita"
-      descripcion: "Crear una visita para la solicitud del servicio del usuario."
-      recopila la siguiente información:
-      - Horario: días y horario disponible para ser visitado.
-      - Nombre: nombre del usuario (esto puede ser capturado al inicio de la conversación, cuando lo saluda). 'No le pidas nombre completo, solo nombre'
-      - Observación (opcional): alguna observación que necesite hacer (si no anda el timbre, color de la puerta, que le avise al portero del edificio, etc.).
-      - numero de casa: número de casa del usuario que ya tienes cuando consultaste el seduvi, no le vuelvas a preguntar por el número.
-      - calle: calle del usuario que ya tienes cuando consultaste el seduvi, no le vuelvas a preguntar por la calle.
-      - piso: piso del usuario
-      - departamento: departamento del usuario
+    ### Herramienta para obtener la información del seduvi
+    
+     name: "obtener_seduvi",
+    description:
+      "Obtiene la informacion del seduvi segun la información brindada por el usuario como Alcaldía, colonia, calle, numero",
+    schema: z.object({
+      alcaldia: z.string().describe("Lugar donde se encuentra el inmueble"),
+      calle: z.string().describe("Calle donde se encuentra el inmueble"),
+      numero: z
+        .string()
+        .describe(
+          "Numero de condominio donde se encuentra el inmueble, es el número externo",
+        ),
+      colonia: z.string().describe("Colonia donde se encuentra el inmueble"),
+    }),
+
+
+
+    ### Herramienta para crear la visita
+
+    name: "crear_visita",
+    description:
+      "Obtiene los datos del domicilio para crear una visita por la solicitud de servicio",
+    schema: z.object({
+      observacion: z
+        .string()
+        .describe(
+          "Observaciones que tenga el cliente sobre su domicilio para la concertación de la visita, si no anda el timbre, color de la puerta, que le avise al portero del edificio, etc.",
+        ),
+      nombre: z.string().describe("Nombre del cliente"),
+      horario: z
+        .string()
+        .describe(
+          "El horario y los dias que tiene disponible el usuario para recibir la visita, dias y horas disponibles para ser visitado/a",
+        ),
+      numero_de_casa: z.string().describe("Numero de casa"),
+      piso: z.string().describe("Piso del cliente"),
+      departamento: z.string().describe("Departamento del cliente"),
+      telefono: z.string().describe("Telefono del cliente"),
+    }),
 
         
       ### Regla estricta para las herramientas:
